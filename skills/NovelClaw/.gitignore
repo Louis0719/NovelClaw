@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.venv/
+.venv-shared/
+.local-dev-secrets/
+state_snapshots/**
+!state_snapshots/README.md
+apps/**/local_web_portal/data/*.db
+apps/**/local_web_portal/data/*.key
+apps/**/local_web_portal/data/*.secret
+apps/**/local_web_portal/runs/**
+!apps/**/local_web_portal/runs/.keep

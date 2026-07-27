@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}{{ "协作会话 | CoLong MultiAgent" if locale() == "zh-CN" else "Copilot Sessions | CoLong MultiAgent" }}{% endblock %}
+{% block content %}
+{% set is_zh = locale() == "zh-CN" %}
+{% set ns = namespace(active_sessions=0) %}
+{% for session in idea_sessions %}
+  {% if session.status == "active" %}
+    {% set ns.active_sessions = ns.active_sessions + 1 %}
+  {% endif %}
+{% endfor %}
+
+<section class="section-page-hero">
+  <div class="section-page-copy">
+    <span class="section-eyebrow">{{ "Copilot Sessions" if not is_zh else "协作会话" }}</span>
+    <h1>{{ "把想法澄清这件事，从任务页里独立出来。" if is_zh else "Give idea refinement a page of its own." }}</h1>
+    <p>{{ "这里专门启动和查看多轮协作打磨。先把 brief 磨得更稳，再决定要不要进入正式生成，逻辑会清楚很多。" if is_zh else "This page is dedicated to collaborative refinement. Clarify the brief first, then decide whether to launch the real generation flow." }}</p>
+  </div>
+  <div class="section-page-side">
+    <div class="hero-side-card">
+      <span>{{ "已展示会话" if is_zh else "Sessions shown" }}</span>
+      <strong>{{ idea_sessions|length }}</strong>
+      <small>{{ "当前页面最多显示最近 60 条会话" if is_zh else "The latest 60 sessions are shown here" }}</small>
+    </div>
+    <div class="hero-side-card accent">
+      <span>{{ "活跃会话" if is_zh else "Active sessions" }}</span>
+      <strong>{{ ns.active_sessions }}</strong>
+      <small>{{ "活跃会话可以继续追问，也可以直接确认转任务" if is_zh else "Active sessions can continue refining or jump straight into a job" }}</small>
+    </div>
+  </div>
+</section>
+
+{% if message %}
+<div class="alert alert-ok">{{ t(message) }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-error">{{ t(error) }}</div>
+{% endif %}
+
+<section class="workspace-grid">
+  <div class="workspace-main-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Start Session" if not is_zh else "发起新会话" }}</span>
+          <h2>{{ t("dashboard.copilot_title") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ t("dashboard.copilot_subtitle") }}</p>
+      </div>
+
+      {% if providers %}
+      <section class="soft-panel launch-panel">
+        <form method="post" action="{{ app_path('/idea-copilot/start') }}" class="form-stack">
+          <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+          <label>{{ t("dashboard.provider") }}</label>
+          <select name="provider" required>
+            {% for provider in providers %}
+            {% set spec = provider_specs.get(provider) %}
+            <option value="{{ provider }}" {% if provider == default_provider %}selected{% endif %}>{{ spec.label if spec else provider|upper }}</option>
+            {% endfor %}
+          </select>
+          <label>{{ t("dashboard.initial_idea") }}</label>
+          <textarea name="idea" rows="8" required placeholder="{{ t('dashboard.initial_idea_placeholder') }}"></textarea>
+          <button type="submit" class="btn btn-primary btn-block">{{ t("dashboard.start_copilot") }}</button>
+        </form>
+      </section>
+      {% else %}
+      <div class="empty-state">
+        <strong>{{ t("dashboard.need_provider") }}</strong>
+        <p>{{ "先到 Provider 页面配置至少一个可用模型，这里才能开启协作打磨。" if is_zh else "Configure at least one working model on the Providers page before starting a copilot session." }}</p>
+      </div>
+      {% endif %}
+    </article>
+
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Session List" if not is_zh else "会话列表" }}</span>
+          <h2>{{ t("dashboard.sessions_title") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ "看得见准备度、轮次和当前状态，下一步该继续问还是确认生成会更明确。" if is_zh else "Readiness, rounds, and current state stay visible so you can judge whether to keep refining or confirm a run." }}</p>
+      </div>
+
+      {% if idea_sessions %}
+      <div class="session-card-list session-card-grid">
+        {% for s in idea_sessions %}
+        {% set sess_spec = provider_specs.get(s.provider) %}
+        <article class="session-card session-card-rich">
+          <div class="session-card-head">
+            <div>
+              <h3>#{{ s.id }}</h3>
+              <p class="muted">{{ sess_spec.label if sess_spec else s.provider|upper }}</p>
+            </div>
+            <span class="pill pill-{{ s.status }}">{{ t("status." ~ s.status) }}</span>
+          </div>
+          <div class="session-card-metrics">
+            <span>{{ "轮次" if is_zh else "Rounds" }} {{ s.round_count }}</span>
+            <span>{{ "准备度" if is_zh else "Readiness" }} {{ s.readiness_score }}%</span>
+            <span>{{ s.updated_at.strftime("%Y-%m-%d %H:%M:%S") }}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar" style="width: {{ s.readiness_score }}%;"></div>
+          </div>
+          <div class="hero-action-row">
+            <a href="{{ app_path('/idea-copilot/' ~ s.id) }}" class="btn btn-outline btn-xs">{{ t("dashboard.open") }}</a>
+            {% if s.status == "active" %}
+            <form method="post" action="{{ app_path('/idea-copilot/' ~ s.id ~ '/cancel') }}" class="inline-form" onsubmit="return confirm({{ t('dashboard.confirm_cancel_session')|tojson }});">
+              <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+              <button type="submit" class="btn btn-ghost btn-xs">{{ t("dashboard.cancel") }}</button>
+            </form>
+            {% elif s.final_job_id %}
+            <a href="{{ app_path('/jobs/' ~ s.final_job_id) }}" class="btn btn-ghost btn-xs">{{ t("dashboard.job_link", job_id=s.final_job_id) }}</a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.sessions_empty") }}</strong></div>
+      {% endif %}
+    </article>
+  </div>
+
+  <aside class="workspace-side-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Readiness Lens" if not is_zh else "准备度透镜" }}</span>
+          <h2>{{ "最近会话信号" if is_zh else "Recent session signals" }}</h2>
+        </div>
+      </div>
+
+      {% if idea_sessions %}
+      <div class="signal-list signal-list-compact">
+        {% for s in idea_sessions[:5] %}
+        <div class="signal-row signal-row-stack">
+          <div>
+            <span>#{{ s.id }} · {{ provider_specs.get(s.provider).label if provider_specs.get(s.provider) else s.provider|upper }}</span>
+            <small>{{ s.updated_at.strftime("%m-%d %H:%M") }}</small>
+          </div>
+          <strong>{{ s.readiness_score }}%</strong>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.sessions_empty") }}</strong></div>
+      {% endif %}
+    </article>
+
+    <article class="feature-panel guide-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Workflow" if not is_zh else "协作流程" }}</span>
+          <h2>{{ "从模糊想法到正式任务" if is_zh else "From fuzzy premise to formal run" }}</h2>
+        </div>
+      </div>
+      <ol class="step-list">
+        <li>
+          <strong>{{ "先丢进一个粗略想法" if is_zh else "Start with a rough premise" }}</strong>
+          <span>{{ "不需要一次写全，先把人物、题材和冲突扔进来。" if is_zh else "You do not need a perfect brief. Start with genre, characters, and tension." }}</span>
+        </li>
+        <li>
+          <strong>{{ "多轮澄清，把设定磨稳" if is_zh else "Refine across multiple rounds" }}</strong>
+          <span>{{ "通过追问把主线、视角、情绪曲线和世界规则补齐。" if is_zh else "Use follow-up rounds to clarify arc, POV, emotional curve, and world rules." }}</span>
+        </li>
+        <li>
+          <strong>{{ "准备度足够后再确认生成" if is_zh else "Confirm only when readiness is high" }}</strong>
+          <span>{{ "这样正式任务会更稳，返工会更少。" if is_zh else "That gives the real generation run a cleaner brief and fewer revisions." }}</span>
+        </li>
+      </ol>
+    </article>
+  </aside>
+</section>
+{% endblock %}

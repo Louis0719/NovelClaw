@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}{{ "Providers | CoLong MultiAgent" if locale() == "zh-CN" else "Providers | CoLong MultiAgent" }}{% endblock %}
+{% block content %}
+{% set is_zh = locale() == "zh-CN" %}
+{% set ns = namespace(saved_keys=0) %}
+{% for provider in providers %}
+  {% if cred_map.get(provider) %}
+    {% set ns.saved_keys = ns.saved_keys + 1 %}
+  {% endif %}
+{% endfor %}
+
+<section class="section-page-hero">
+  <div class="section-page-copy">
+    <span class="section-eyebrow">{{ "Providers" if not is_zh else "Provider 页" }}</span>
+    <h1>{{ "把 API Key、模型和接入地址，放进一张更稳的控制面里。" if is_zh else "A steadier control surface for keys, models, and endpoints." }}</h1>
+    <p>{{ "首页不再承担所有接入配置。这里专门处理密钥、Base URL、Model 和自定义 Provider，让前端结构和实际工作流一致。" if is_zh else "The overview no longer carries all setup forms. This page is dedicated to API keys, base URLs, models, and custom provider definitions so the interface matches the real workflow." }}</p>
+  </div>
+  <div class="section-page-side">
+    <div class="hero-side-card">
+      <span>{{ "可用 Provider" if is_zh else "Available providers" }}</span>
+      <strong>{{ providers|length }}</strong>
+      <small>{{ "包含内置 Provider 和你新增的自定义接入" if is_zh else "Includes built-in options and your custom integrations" }}</small>
+    </div>
+    <div class="hero-side-card accent">
+      <span>{{ "已保存密钥" if is_zh else "Saved keys" }}</span>
+      <strong>{{ ns.saved_keys }}</strong>
+      <small>{{ "密钥会以加密形式保存并用于任务与会话" if is_zh else "Keys are stored securely and reused by both runs and sessions" }}</small>
+    </div>
+  </div>
+</section>
+
+{% if message %}
+<div class="alert alert-ok">{{ t(message) }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-error">{{ t(error) }}</div>
+{% endif %}
+
+<section class="workspace-grid workspace-grid-providers">
+  <div class="workspace-main-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Provider Vault" if not is_zh else "密钥仓" }}</span>
+          <h2>{{ t("dashboard.api_keys_title") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ t("dashboard.api_keys_subtitle") }}</p>
+      </div>
+
+      {% if providers %}
+      <div class="provider-card-grid">
+        {% for provider in providers %}
+        {% set spec = provider_specs.get(provider) %}
+        {% set provider_label = spec.label if spec else provider|upper %}
+        <form method="post" action="{{ app_path('/api-keys') }}" class="provider-card provider-card--vault">
+          <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+          <div class="provider-card-head">
+            <div>
+              <h3>{{ provider_label }}</h3>
+              <p class="muted">{{ spec.base_url if spec else "-" }}</p>
+            </div>
+            <span class="pill {% if cred_map.get(provider) %}pill-succeeded{% else %}pill-queued{% endif %}">
+              {% if cred_map.get(provider) %}
+                {{ "已保存" if is_zh else "Ready" }}
+              {% else %}
+                {{ "未保存" if is_zh else "Missing" }}
+              {% endif %}
+            </span>
+          </div>
+          <div class="provider-meta">
+            <span>{{ t("common.model") }}: {{ spec.model if spec else "-" }}</span>
+            <span>{{ t("common.mode") }}: {{ spec.wire_api if spec else "chat" }}</span>
+          </div>
+          <p class="key-hint">
+            {% if cred_map.get(provider) %}
+              {{ t("dashboard.saved_hint", hint=cred_map.get(provider).key_hint) }}
+            {% else %}
+              {{ t("dashboard.not_saved") }}
+            {% endif %}
+          </p>
+          <input type="hidden" name="provider" value="{{ provider }}">
+          <input type="password" name="api_key" required placeholder="{{ t('dashboard.api_key_placeholder', provider=provider) }}">
+          <button type="submit" class="btn btn-outline btn-block">{{ t("dashboard.save_key", provider=provider|upper) }}</button>
+        </form>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.no_providers") }}</strong></div>
+      {% endif %}
+    </article>
+  </div>
+
+  <aside class="workspace-side-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Composer" if not is_zh else "新建接入" }}</span>
+          <h2>{{ t("dashboard.custom_providers_title") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ t("dashboard.custom_providers_subtitle") }}</p>
+      </div>
+      <section class="soft-panel">
+        <form method="post" action="{{ app_path('/providers') }}" class="form-grid">
+          <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+          <div>
+            <label>{{ t("dashboard.slug") }}</label>
+            <input type="text" name="slug" required placeholder="{{ t('dashboard.slug_placeholder') }}" minlength="2" maxlength="32">
+          </div>
+          <div>
+            <label>{{ t("dashboard.display_label") }}</label>
+            <input type="text" name="label" placeholder="{{ t('dashboard.display_label_placeholder') }}">
+          </div>
+          <div>
+            <label>{{ t("dashboard.base_url") }}</label>
+            <input type="text" name="base_url" required placeholder="{{ t('dashboard.base_url_placeholder') }}">
+          </div>
+          <div>
+            <label>{{ t("dashboard.model") }}</label>
+            <input type="text" name="model" required placeholder="{{ t('dashboard.model_placeholder') }}">
+          </div>
+          <div>
+            <label>{{ t("dashboard.wire_mode") }}</label>
+            <select name="wire_api">
+              <option value="chat" selected>{{ t("dashboard.wire_chat") }}</option>
+              <option value="responses">{{ t("dashboard.wire_responses") }}</option>
+            </select>
+          </div>
+          <div class="form-grid-action">
+            <button type="submit" class="btn btn-primary btn-block">{{ t("dashboard.save_provider") }}</button>
+          </div>
+        </form>
+      </section>
+    </article>
+
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Custom Stack" if not is_zh else "自定义列表" }}</span>
+          <h2>{{ "当前自定义接入" if is_zh else "Current custom providers" }}</h2>
+        </div>
+      </div>
+
+      {% if custom_providers %}
+      <div class="custom-provider-list">
+        {% for p in custom_providers %}
+        <article class="custom-provider-card">
+          <div class="custom-provider-head">
+            <div>
+              <h3>{{ p.label if p.label else p.slug|upper }}</h3>
+              <p class="muted">{{ p.slug }}</p>
+            </div>
+            <span class="pill">{{ p.wire_api }}</span>
+          </div>
+          <div class="custom-provider-meta">
+            <span>{{ p.base_url }}</span>
+            <span>{{ p.model }}</span>
+          </div>
+          <form method="post" action="{{ app_path('/providers/' ~ p.slug ~ '/delete') }}" class="inline-form" onsubmit="return confirm({{ t('dashboard.confirm_delete_provider', slug=p.slug)|tojson }});">
+            <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+            <button type="submit" class="btn btn-ghost btn-xs">{{ t("common.delete") }}</button>
+          </form>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.custom_providers_empty") }}</strong></div>
+      {% endif %}
+    </article>
+  </aside>
+</section>
+{% endblock %}

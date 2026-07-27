@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}{{ t("idea.page_title", id=session_data.id) }}{% endblock %}
+{% block content %}
+{% set is_zh = locale() == "zh-CN" %}
+{% set latest = latest_turn|default({}, true) %}
+{% set latest_questions = latest.questions if latest.questions is defined else [] %}
+
+<section class="detail-hero">
+  <div class="detail-hero-copy">
+    <span class="section-eyebrow">{{ "Copilot Session" if not is_zh else "协作打磨会话" }}</span>
+    <h1>{{ t("idea.heading", id=session_data.id) }}</h1>
+    <p class="detail-hero-meta">
+      <span>{{ t("dashboard.provider") }} <strong>{{ provider_label }}</strong></span>
+      <span>{{ t("common.status") }} <strong class="pill pill-{{ session_data.status }}">{{ t("status." ~ session_data.status) }}</strong></span>
+      <span>{{ t("common.rounds") }} <strong>{{ session_data.round_count }}</strong></span>
+      <span>{{ t("common.readiness") }} <strong>{{ session_data.readiness_score }}%</strong></span>
+    </p>
+  </div>
+  <div class="hero-action-row detail-hero-actions">
+    {% if session_data.status == "active" %}
+    <form method="post" action="{{ app_path('/idea-copilot/' ~ session_data.id ~ '/confirm') }}" class="inline-form">
+      <button type="submit" class="btn btn-primary">{{ t("idea.confirm_start") }}</button>
+    </form>
+    <form method="post" action="{{ app_path('/idea-copilot/' ~ session_data.id ~ '/cancel') }}" class="inline-form" onsubmit="return confirm({{ t('idea.confirm_cancel_session')|tojson }});">
+      <button type="submit" class="btn btn-outline">{{ t("idea.cancel_session") }}</button>
+    </form>
+    {% elif session_data.final_job_id %}
+    <a class="btn btn-primary" href="{{ app_path('/jobs/' ~ session_data.final_job_id) }}">{{ t("idea.open_generated_job", job_id=session_data.final_job_id) }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% if message %}
+<div class="alert alert-ok">{{ t(message) }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-error">{{ t(error) }}</div>
+{% endif %}
+
+<section class="metric-ribbon">
+  <article class="metric-card">
+    <span>{{ t("common.rounds") }}</span>
+    <strong>{{ session_data.round_count }}</strong>
+    <small>{{ "已经完成的往返澄清轮次" if is_zh else "Refinement turns completed so far" }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ t("common.readiness") }}</span>
+    <strong>{{ session_data.readiness_score }}%</strong>
+    <small>{{ latest.ready_hint if latest.ready_hint is defined else ("继续补齐细节再确认生成" if is_zh else "Keep refining until the brief feels ready") }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ "更新时间" if is_zh else "Updated" }}</span>
+    <strong>{{ session_data.updated_at.strftime("%H:%M:%S") }}</strong>
+    <small>{{ session_data.updated_at.strftime("%Y-%m-%d") }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ "当前状态" if is_zh else "Session state" }}</span>
+    <strong>{{ t("status." ~ session_data.status) }}</strong>
+    <small>{{ "准备好后可以一键确认进入正式任务" if is_zh else "Confirm once the draft is ready for a full generation run" }}</small>
+  </article>
+</section>
+
+<section class="workspace-grid detail-grid">
+  <div class="workspace-main-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Idea Frame" if not is_zh else "创意底稿" }}</span>
+          <h2>{{ "从原始想法到当前草案" if is_zh else "From raw idea to current draft" }}</h2>
+        </div>
+      </div>
+      <div class="panel-split panel-split-equal">
+        <section class="idea-pane">
+          <span class="mini-kicker">{{ "Original" if not is_zh else "原始想法" }}</span>
+          <div class="idea-surface">{{ session_data.original_idea }}</div>
+        </section>
+        <section class="idea-pane">
+          <span class="mini-kicker">{{ "Refined" if not is_zh else "当前打磨稿" }}</span>
+          <div class="idea-surface">{{ session_data.refined_idea if session_data.refined_idea else session_state.refined_idea }}</div>
+        </section>
+      </div>
+      <p class="muted">{{ t("idea.updated_at", time=session_data.updated_at.strftime("%Y-%m-%d %H:%M:%S")) }}</p>
+    </article>
+
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Conversation Thread" if not is_zh else "会话线程" }}</span>
+          <h2>{{ t("idea.conversation_history") }}</h2>
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="chat-stream">
+        {% for msg in messages %}
+          {% if msg.role == "assistant" %}
+          <div class="chat-bubble chat-assistant">
+            <div class="chat-role">{{ t("common.copilot") }} · {{ t("idea.readiness_line", readiness=msg.readiness) }}</div>
+            <div class="assistant-copy">{{ msg.analysis }}</div>
+            {% if msg.questions %}
+            <ul class="question-list">
+              {% for q in msg.questions %}
+              <li>{{ q }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% elif msg.role == "user" %}
+          <div class="chat-bubble chat-user">
+            <div class="chat-role">{{ t("common.you") }}</div>
+            <div class="assistant-copy">{{ msg.content }}</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("idea.no_conversation") }}</strong></div>
+      {% endif %}
+    </article>
+  </div>
+
+  <aside class="workspace-side-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Latest Turn" if not is_zh else "本轮输出" }}</span>
+          <h2>{{ t("idea.latest_output") }}</h2>
+        </div>
+      </div>
+      <p class="muted">{{ t("idea.analysis") }}</p>
+      <div class="idea-surface compact">{{ latest.analysis if latest.analysis is defined else "" }}</div>
+      <p class="muted">{{ t("idea.suggested_questions") }}</p>
+      {% if latest_questions %}
+      <ol class="question-list ordered">
+        {% for q in latest_questions %}
+        <li>{{ q }}</li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="muted">{{ t("idea.no_pending_question") }}</p>
+      {% endif %}
+      <div class="readiness-block">
+        <div class="readiness-row">
+          <span>{{ t("common.readiness") }}</span>
+          <strong>{{ session_data.readiness_score }}%</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" style="width: {{ session_data.readiness_score }}%;"></div>
+        </div>
+        <p class="muted">{{ t("idea.ready_hint", hint=(latest.ready_hint if latest.ready_hint is defined else "")) }}</p>
+      </div>
+    </article>
+
+    <article class="feature-panel">
+      {% if session_data.status == "active" %}
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Reply Pad" if not is_zh else "回复输入区" }}</span>
+          <h2>{{ t("idea.reply_label") }}</h2>
+        </div>
+      </div>
+      <form method="post" action="{{ app_path('/idea-copilot/' ~ session_data.id ~ '/reply') }}" class="form-stack">
+        <textarea name="reply" rows="10" required placeholder="{{ t('idea.reply_placeholder') }}"></textarea>
+        <button type="submit" class="btn btn-outline btn-block">{{ t("idea.reply_submit") }}</button>
+      </form>
+      {% else %}
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Session Closed" if not is_zh else "会话已结束" }}</span>
+          <h2>{{ t("idea.session_inactive") }}</h2>
+        </div>
+      </div>
+      <div class="empty-state">
+        <strong>{{ t("idea.session_inactive") }}</strong>
+        {% if session_data.final_job_id %}
+        <p><a class="btn btn-primary" href="{{ app_path('/jobs/' ~ session_data.final_job_id) }}">{{ t("idea.open_generated_job", job_id=session_data.final_job_id) }}</a></p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </article>
+
+    <a href="{{ app_path('/sessions') }}" class="btn btn-ghost btn-block">{{ "返回协作页" if is_zh else "Back to sessions" }}</a>
+  </aside>
+</section>
+{% endblock %}

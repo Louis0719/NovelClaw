@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="{{ locale() }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ t("common.site_name") }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ app_path('/static/style.css') }}?v=20260328multiagent11">
+</head>
+<body class="portal-console{% if user %} portal-console-app{% else %} portal-console-auth{% endif %}">
+  {% set current_path = current_public_path(request) %}
+  {% set is_dashboard = current_path.startswith(app_path('/dashboard')) %}
+  {% set is_jobs = current_path.startswith(app_path('/jobs')) %}
+  {% set is_providers = current_path.startswith(app_path('/providers')) %}
+  {% set is_sessions = current_path.startswith(app_path('/sessions')) or '/idea-copilot/' in current_path %}
+  {% set is_zh = locale() == "zh-CN" %}
+
+  <div class="portal-bg">
+    <div class="portal-orb portal-orb-a"></div>
+    <div class="portal-orb portal-orb-b"></div>
+    <div class="portal-orb portal-orb-c"></div>
+    <div class="portal-grid"></div>
+    <div class="portal-noise"></div>
+  </div>
+
+  {% set page_content %}{% block content %}{% endblock %}{% endset %}
+
+  {% if user %}
+  <div class="console-shell">
+    <div class="console-sidebar-scrim" data-sidebar-overlay></div>
+
+    <aside class="console-sidebar" data-sidebar>
+      <div class="console-sidebar-inner">
+        <div class="console-sidebar-main">
+          <div class="console-sidebar-topline">
+            <span class="console-mode-chip">{{ "MultiAgent 模式" if is_zh else "MultiAgent mode" }}</span>
+            <button
+              type="button"
+              class="sidebar-toggle sidebar-toggle-desktop"
+              data-sidebar-toggle
+              aria-label="{{ '切换侧栏' if is_zh else 'Toggle sidebar' }}"
+              aria-expanded="true"
+            >
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          <a href="{{ app_path('/dashboard') }}" class="console-brand">
+            <span class="console-brand-mark">CO</span>
+            <span class="console-brand-copy">
+              <strong>CoLong MultiAgent</strong>
+              <small>{{ "长篇故事的多工作流控制台" if is_zh else "A sharper control room for long-form story work" }}</small>
+            </span>
+          </a>
+
+          <div class="console-sidebar-panel">
+            <div class="console-block-label">{{ "导航" if is_zh else "Navigation" }}</div>
+            <nav class="console-nav">
+              <a href="{{ app_path('/dashboard') }}" class="console-nav-link {% if is_dashboard %}is-active{% endif %}">
+                <span class="console-nav-icon">DB</span>
+                <span class="console-nav-copy">
+                  <strong>{{ "工作台" if is_zh else "Dashboard" }}</strong>
+                  <small>{{ "总览、快捷发起和最近工作" if is_zh else "Overview, quick launch, and recent work" }}</small>
+                </span>
+              </a>
+              <a href="{{ app_path('/jobs') }}" class="console-nav-link {% if is_jobs %}is-active{% endif %}">
+                <span class="console-nav-icon">JB</span>
+                <span class="console-nav-copy">
+                  <strong>{{ "任务" if is_zh else "Jobs" }}</strong>
+                  <small>{{ "任务列表、运行状态和产物查看" if is_zh else "Run list, runtime state, and generated output" }}</small>
+                </span>
+              </a>
+              <a href="{{ app_path('/providers') }}" class="console-nav-link {% if is_providers %}is-active{% endif %}">
+                <span class="console-nav-icon">PV</span>
+                <span class="console-nav-copy">
+                  <strong>{{ "Providers" if is_zh else "Providers" }}</strong>
+                  <small>{{ "密钥、模型和接入地址配置" if is_zh else "Keys, models, and endpoint configuration" }}</small>
+                </span>
+              </a>
+              <a href="{{ app_path('/sessions') }}" class="console-nav-link {% if is_sessions %}is-active{% endif %}">
+                <span class="console-nav-icon">CP</span>
+                <span class="console-nav-copy">
+                  <strong>{{ "协作打磨" if is_zh else "Copilot" }}</strong>
+                  <small>{{ "多轮澄清、准备度和确认生成" if is_zh else "Multi-turn refinement, readiness, and confirm-to-run" }}</small>
+                </span>
+              </a>
+            </nav>
+          </div>
+
+          <section class="console-sidebar-panel console-sidebar-panel-feature">
+            <div class="console-block-label">{{ "工作区状态" if is_zh else "Workspace pulse" }}</div>
+            <h3>{{ "把工作流分开，页面才真正能用。" if is_zh else "Split the flows, then the interface can breathe." }}</h3>
+            <p>
+              {{ "8011 这一套现在专心处理任务、模型配置和协作打磨三条主线，不再让首页承受所有表单和表格。" if is_zh else "Port 8011 is now dedicated to three clear flows: jobs, provider setup, and collaborative refinement instead of cramming everything into one screen." }}
+            </p>
+            <div class="sidebar-feature-list">
+              <span>{{ "任务产出" if is_zh else "Run output" }}</span>
+              <span>{{ "模型接入" if is_zh else "Model access" }}</span>
+              <span>{{ "协作会话" if is_zh else "Copilot sessions" }}</span>
+            </div>
+          </section>
+        </div>
+
+        <div class="console-sidebar-footer">
+          <div class="console-runtime-card">
+            <span class="console-runtime-dot"></span>
+            <div>
+              <strong>{{ "8011 服务在线" if is_zh else "Port 8011 online" }}</strong>
+              <small>{{ current_path }}</small>
+            </div>
+          </div>
+
+          <form method="post" action="{{ app_path('/language') }}" class="console-locale-form">
+            <input type="hidden" name="next" value="{{ current_path }}">
+            <label for="locale-switch" class="console-block-label">{{ "语言" if is_zh else "Language" }}</label>
+            <select id="locale-switch" name="locale" class="locale-select" onchange="this.form.submit()">
+              {% for item in locale_options() %}
+              <option value="{{ item.code }}" {% if item.code == locale() %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <div class="console-account-card">
+            <span class="console-block-label">{{ "当前账号" if is_zh else "Account" }}</span>
+            <strong>{{ user.email }}</strong>
+            <small>{{ "MultiAgent 工作区" if is_zh else "MultiAgent workspace" }}</small>
+          </div>
+
+          <div class="console-sidebar-actions">
+            <a href="{{ shared_path('/select-mode') }}" class="btn btn-outline btn-block">{{ "切换模式" if is_zh else "Switch mode" }}</a>
+            <form method="post" action="{{ shared_path('/logout') }}">
+              <button type="submit" class="btn btn-ghost btn-block">{{ t("common.logout") }}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="console-main">
+      <header class="console-mobile-bar">
+        <button
+          type="button"
+          class="sidebar-toggle sidebar-toggle-mobile"
+          data-sidebar-toggle
+          aria-label="{{ '打开导航' if is_zh else 'Open navigation' }}"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+        </button>
+        <a href="{{ app_path('/dashboard') }}" class="console-mobile-brand">
+          <span class="console-brand-mark">CO</span>
+          <span>{{ "CoLong MultiAgent" if is_zh else "CoLong MultiAgent" }}</span>
+        </a>
+      </header>
+      <div class="console-main-inner">
+        {{ page_content|safe }}
+      </div>
+    </main>
+  </div>
+  {% else %}
+  <div class="auth-shell">
+    <section class="auth-hero-panel">
+      <span class="console-mode-chip">{{ "CoLong / MultiAgent" if is_zh else "CoLong / MultiAgent" }}</span>
+      <h1>{{ "把多智能体写作工作台整理成真正好用的前端。" if is_zh else "A calmer front end for multi-agent story production." }}</h1>
+      <p class="auth-hero-copy">
+        {{ "统一登录后，你会进入 8011 这一套多工作流控制台，任务、Providers 和协作打磨各自有清晰入口。" if is_zh else "After sign-in, the 8011 workspace gives jobs, providers, and collaborative refinement their own clean entry points." }}
+      </p>
+      <div class="auth-hero-grid">
+        <article class="auth-stat-card">
+          <strong>{{ "更清楚的分区" if is_zh else "Sharper separation" }}</strong>
+          <span>{{ "任务、Provider、会话各自成页" if is_zh else "Jobs, providers, and sessions each get their own page" }}</span>
+        </article>
+        <article class="auth-stat-card">
+          <strong>{{ "更快的发起" if is_zh else "Faster launch" }}</strong>
+          <span>{{ "首页只保留两个最高频动作" if is_zh else "Home keeps only the two most-used actions" }}</span>
+        </article>
+        <article class="auth-stat-card">
+          <strong>{{ "更稳的追踪" if is_zh else "Stronger tracking" }}</strong>
+          <span>{{ "日志、章节、Memory 和结果同屏追踪" if is_zh else "Logs, chapters, memory, and final output stay visible together" }}</span>
+        </article>
+      </div>
+    </section>
+
+    <main class="auth-main">
+      <div class="auth-main-inner">
+        {{ page_content|safe }}
+      </div>
+    </main>
+  </div>
+  {% endif %}
+
+  <script>
+    window.PORTAL_BASE_PATH = {{ app_base_path|tojson }};
+    window.PORTAL_LOCALE = {{ locale()|tojson }};
+    window.PORTAL_I18N = {{ client_i18n()|tojson }};
+  </script>
+  <script>
+    (function () {
+      const body = document.body;
+      const sidebar = document.querySelector("[data-sidebar]");
+      const toggles = Array.from(document.querySelectorAll("[data-sidebar-toggle]"));
+      const overlay = document.querySelector("[data-sidebar-overlay]");
+      const key = "multiagent.sidebar.collapsed";
+      const desktopQuery = window.matchMedia("(min-width: 1101px)");
+
+      if (!sidebar || toggles.length === 0) return;
+
+      function syncButtons() {
+        const expanded = desktopQuery.matches
+          ? !body.classList.contains("sidebar-collapsed")
+          : body.classList.contains("sidebar-open");
+        toggles.forEach((btn) => btn.setAttribute("aria-expanded", expanded ? "true" : "false"));
+      }
+
+      function applyDesktopPreference() {
+        body.classList.toggle("sidebar-collapsed", desktopQuery.matches && window.localStorage.getItem(key) === "1");
+        if (desktopQuery.matches) {
+          body.classList.remove("sidebar-open");
+        }
+        syncButtons();
+      }
+
+      function toggleSidebar() {
+        if (desktopQuery.matches) {
+          const next = !body.classList.contains("sidebar-collapsed");
+          body.classList.toggle("sidebar-collapsed", next);
+          window.localStorage.setItem(key, next ? "1" : "0");
+        } else {
+          body.classList.toggle("sidebar-open");
+        }
+        syncButtons();
+      }
+
+      function closeMobileSidebar() {
+        if (!desktopQuery.matches) {
+          body.classList.remove("sidebar-open");
+          syncButtons();
+        }
+      }
+
+      applyDesktopPreference();
+      toggles.forEach((btn) => btn.addEventListener("click", toggleSidebar));
+      if (overlay) overlay.addEventListener("click", closeMobileSidebar);
+      desktopQuery.addEventListener("change", applyDesktopPreference);
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeMobileSidebar();
+      });
+    })();
+  </script>
+</body>
+</html>
