@@ -1,0 +1,19 @@
+[Unit]
+Description=NovelClaw Writing Workspace
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/novelclaw/apps/novelclaw
+EnvironmentFile=/etc/novelclaw/novelclaw.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONUTF8=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/novelclaw/.venv/bin/uvicorn local_web_portal.app.main:app --host 127.0.0.1 --port 8012 --workers 1
+Restart=always
+RestartSec=5
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}{{ "任务页 | CoLong MultiAgent" if locale() == "zh-CN" else "Jobs | CoLong MultiAgent" }}{% endblock %}
+{% block content %}
+{% set is_zh = locale() == "zh-CN" %}
+{% set ns = namespace(running_jobs=0) %}
+{% for job in jobs %}
+  {% if job.status in ["queued", "running"] %}
+    {% set ns.running_jobs = ns.running_jobs + 1 %}
+  {% endif %}
+{% endfor %}
+
+<section class="section-page-hero">
+  <div class="section-page-copy">
+    <span class="section-eyebrow">{{ "Jobs Board" if not is_zh else "任务页" }}</span>
+    <h1>{{ "把生成任务放进一张真正能追踪的任务台里。" if is_zh else "A readable board for every generation run." }}</h1>
+    <p>{{ "这里专门处理任务发起、状态跟踪、删除和结果入口。列表与详情各司其职，不再和 Provider 或协作流程混在同一屏。" if is_zh else "This page focuses on launch, tracking, deletion, and output entry points. The board stays dedicated to runs instead of sharing space with providers or copilot setup." }}</p>
+  </div>
+  <div class="section-page-side">
+    <div class="hero-side-card">
+      <span>{{ "已展示任务" if is_zh else "Runs shown" }}</span>
+      <strong>{{ jobs|length }}</strong>
+      <small>{{ "当前页面最多显示最近 60 条记录" if is_zh else "The latest 60 runs are shown here" }}</small>
+    </div>
+    <div class="hero-side-card accent">
+      <span>{{ "运行中 / 排队" if is_zh else "Running / queued" }}</span>
+      <strong>{{ ns.running_jobs }}</strong>
+      <small>{{ "点开任意一条就能进入实时日志与章节输出" if is_zh else "Open any row to jump into live logs and chapter output" }}</small>
+    </div>
+  </div>
+</section>
+
+{% if message %}
+<div class="alert alert-ok">{{ t(message) }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-error">{{ t(error) }}</div>
+{% endif %}
+
+<section class="workspace-grid">
+  <div class="workspace-main-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Launch Pad" if not is_zh else "新建任务" }}</span>
+          <h2>{{ t("dashboard.create_job") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ "适合 brief 已经成型，直接跑完整长篇生成流程。" if is_zh else "Use this when the brief is already solid and you want to run the full story pipeline immediately." }}</p>
+      </div>
+
+      {% if providers %}
+      <section class="soft-panel launch-panel">
+        <form method="post" action="{{ app_path('/jobs') }}" class="form-stack">
+          <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+          <label>{{ t("dashboard.provider") }}</label>
+          <select name="provider" required>
+            {% for provider in providers %}
+            {% set spec = provider_specs.get(provider) %}
+            <option value="{{ provider }}" {% if provider == default_provider %}selected{% endif %}>{{ spec.label if spec else provider|upper }}</option>
+            {% endfor %}
+          </select>
+          <label>{{ t("dashboard.story_idea") }}</label>
+          <textarea name="idea" rows="8" required placeholder="{{ t('dashboard.story_idea_placeholder') }}"></textarea>
+          <button type="submit" class="btn btn-primary btn-block">{{ t("dashboard.create_job") }}</button>
+        </form>
+      </section>
+      {% else %}
+      <div class="empty-state">
+        <strong>{{ t("dashboard.need_provider") }}</strong>
+        <p>{{ "先去 Provider 页面保存可用的 API Key 和模型配置，再回来启动任务。" if is_zh else "Save a working API key and model config on the Providers page first, then come back here to launch runs." }}</p>
+      </div>
+      {% endif %}
+    </article>
+
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Run Table" if not is_zh else "任务列表" }}</span>
+          <h2>{{ t("dashboard.recent_jobs_title") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ "保留最关键的字段，让筛查和跳转更顺手。" if is_zh else "Keep only the fields that help you scan faster and jump into the detail view." }}</p>
+      </div>
+
+      {% if jobs %}
+      <div class="table-shell">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ t("common.id") }}</th>
+                <th>{{ t("dashboard.provider") }}</th>
+                <th>{{ t("common.status") }}</th>
+                <th>{{ t("common.created") }}</th>
+                <th>{{ t("common.action") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in jobs %}
+              {% set job_spec = provider_specs.get(job.provider) %}
+              <tr>
+                <td>#{{ job.id }}</td>
+                <td>{{ job_spec.label if job_spec else job.provider|upper }}</td>
+                <td><span class="pill pill-{{ job.status }}">{{ t("status." ~ job.status) }}</span></td>
+                <td>{{ job.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+                <td class="table-actions">
+                  <a href="{{ app_path('/jobs/' ~ job.id) }}" class="link-btn">{{ t("dashboard.view") }}</a>
+                  {% if job.status in ["queued", "running"] %}
+                  <form method="post" action="{{ app_path('/jobs/' ~ job.id ~ '/cancel') }}" class="inline-form">
+                    <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+                    <button type="submit" class="btn btn-outline btn-xs">{{ t("dashboard.cancel_job") }}</button>
+                  </form>
+                  {% else %}
+                  <form method="post" action="{{ app_path('/jobs/' ~ job.id ~ '/delete') }}" class="inline-form" onsubmit="return confirm({{ t('dashboard.confirm_delete_job', job_id=job.id)|tojson }});">
+                    <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+                    <button type="submit" class="btn btn-outline btn-xs">{{ t("dashboard.delete_job") }}</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.recent_jobs_empty") }}</strong></div>
+      {% endif %}
+    </article>
+  </div>
+
+  <aside class="workspace-side-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Spotlight" if not is_zh else "焦点任务" }}</span>
+          <h2>{{ "最近任务卡片" if is_zh else "Recent run cards" }}</h2>
+        </div>
+      </div>
+      {% if jobs %}
+      <div class="run-spotlight-grid">
+        {% for job in jobs[:4] %}
+        {% set job_spec = provider_specs.get(job.provider) %}
+        {% set job_preview = job.idea|replace('\n', ' ') %}
+        <article class="run-spotlight-card">
+          <div class="run-spotlight-head">
+            <div>
+              <span class="section-eyebrow">#{{ job.id }}</span>
+              <h3>{{ job_spec.label if job_spec else job.provider|upper }}</h3>
+            </div>
+            <span class="pill pill-{{ job.status }}">{{ t("status." ~ job.status) }}</span>
+          </div>
+          <p class="run-spotlight-copy">{{ job_preview[:180] }}{% if job_preview|length > 180 %}...{% endif %}</p>
+          <div class="run-spotlight-meta">
+            <span>{{ job.created_at.strftime("%m-%d %H:%M") }}</span>
+          </div>
+          <a href="{{ app_path('/jobs/' ~ job.id) }}" class="btn btn-ghost btn-xs">{{ t("dashboard.view") }}</a>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ t("dashboard.recent_jobs_empty") }}</strong></div>
+      {% endif %}
+    </article>
+  </aside>
+</section>
+{% endblock %}

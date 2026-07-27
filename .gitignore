@@ -144,3 +144,127 @@ MediaCrawler/config.json
 .openclaw/
 openclaw_data/
 *.pid
+
+# =============================================================================
+# OpenClaw 私人文件（不可上传）
+# =============================================================================
+MEMORY.md
+USER.md
+HEARTBEAT.md
+SESSION-STATE.md
+IDENTITY.md
+SOUL.md
+AGENTS.md
+TOOLS.md
+QUICKREF.md
+
+# OpenClaw 运行时数据
+HEARTBEAT.md
+callback_*.json
+openclaw_*.json
+*-state.json
+
+# 个人桌面文件
+~/Desktop/*.txt
+~/Desktop/*.docx
+~/Desktop/*.pdf
+
+# 笔记和草稿（按需调整）
+*.draft.md
+*_draft.md
+notes/
+notes.md
+草稿/
+
+# =============================================================================
+# 根目录杂项文件（按需排除）
+# =============================================================================
+
+# 图片和截图
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+*.webp
+
+# 视频和音频
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.m4a
+*.mp3
+*.wav
+
+# 文档
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.pptx
+
+# Root-level markdown files (workspace-specific, not project docs)
+*.md
+!README.md
+!CHANGELOG.md
+!LICENSE.md
+!.gitkeep
+
+# JSON configs
+*.json
+!package.json
+!.env.example
+
+# 编译产物
+*.class
+*.o
+*.obj
+
+# 桌面服务文件
+com.apple.timemachine.*
+weixin-send.sh
+
+# =============================================================================
+# 第三方项目（建议作为独立仓库，不放在此主仓库）
+# =============================================================================
+MoneyPrinterTurbo/
+ComfyUI/
+CLI-Anything/
+MediaCrawler/
+agency-agents-zh/
+fangshe-app/
+fangshe-web/
+
+# Root杂项文件
+package.json
+test-*.cjs
+test-*.mjs
+check_final.py
+expand_chapters.py
+x-mcp-*.js
+x-mcp-*.sh
+
+# 业务项目（按需上传）
+higgs-textile-catalog/
+migration/
+novel_study/
+novels/
+profiles/
+scripts/
+social-auto-upload/
+xhs-mcp/
+.clawhub/
+
+# 测试文件
+xhs-video-fetch.js
+
+# 中文名私人文件
+*[\344\277\256\344\273\231]*
+*[\345\222\270\351\261\274]*
+
+# 中文名工作文件
+344277256344273231345272237347211251345245271350272272350265242344272206_344270203347214253345256214346225264347211210.txt
+345272237347211251347273221345256232344272206347245236344273231347263273347273237_346212225347250277347211210.txt

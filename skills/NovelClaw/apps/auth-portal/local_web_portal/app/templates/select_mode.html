@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% set zh = ui_language != "en" %}
+{% block title %}{% if zh %}选择模式 | NovelClaw 工作台{% else %}Choose Mode | NovelClaw Workspace{% endif %}{% endblock %}
+{% block content %}
+<div class="auth-page-shell auth-page-shell-register">
+  <header class="auth-page-topbar auth-page-topbar-register">
+    <a href="/select-mode" class="auth-page-brand auth-page-brand-link">
+      <span class="auth-page-brand-mark">NC</span>
+      <span>NovelClaw</span>
+    </a>
+    <div class="auth-register-top-actions">
+      <div class="auth-locale-switch">
+        <form method="post" action="/ui-language">
+          <input type="hidden" name="lang" value="zh">
+          <input type="hidden" name="next" value="/select-mode">
+          <button class="lang-btn {% if zh %}is-active{% endif %}" type="submit">中文</button>
+        </form>
+        <form method="post" action="/ui-language">
+          <input type="hidden" name="lang" value="en">
+          <input type="hidden" name="next" value="/select-mode">
+          <button class="lang-btn {% if not zh %}is-active{% endif %}" type="submit">English</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <section class="auth-wrap auth-wrap-portal auth-wrap-register">
+    <article class="auth-hero auth-hero-portal auth-hero-register">
+      <div class="auth-hero-badge">{% if zh %}模式入口{% else %}Mode Entry{% endif %}</div>
+      <h1>{% if zh %}从这里开始，选择你的小说工作台{% else %}Start here and choose your novel workspace{% endif %}</h1>
+      <p class="auth-hero-copy">
+        {% if zh %}
+        这是公开版的本地入口，不包含注册、登录、邮箱验证等账号流程。你打开后就能直接进入工作台选择阶段，再按需进入不同创作模式。
+        {% else %}
+        This is the public local entry point. It does not expose registration, login, or email verification flows. Open it and go straight to workspace selection.
+        {% endif %}
+      </p>
+      <div class="auth-hero-stack">
+        <div class="auth-hero-pill">{% if zh %}从 /select-mode 直接开始{% else %}Start directly from /select-mode{% endif %}</div>
+        <div class="auth-hero-pill">{% if zh %}MultiAgent 与 NovelClaw 双工作台{% else %}Dual workspaces: MultiAgent and NovelClaw{% endif %}</div>
+        <div class="auth-hero-pill">{% if zh %}当前预览：{{ current_mode_label }}{% else %}Current preview: {{ current_mode_label }}{% endif %}</div>
+      </div>
+    </article>
+
+    <article class="auth-card auth-card-portal auth-card-register">
+      <div class="auth-card-head">
+        <div>
+          <div class="auth-card-kicker">{% if zh %}进入工作台{% else %}Enter workspace{% endif %}</div>
+          <h1>{% if zh %}选择你要打开的小说工作台{% else %}Choose the novel workspace to open{% endif %}</h1>
+          <p class="auth-card-subtitle">
+            {% if zh %}
+            当前公开版默认以本地预览会话进入，不再展示原始账户认证逻辑。
+            {% else %}
+            The public release enters with a local preview session by default and does not expose the original account flow.
+            {% endif %}
+          </p>
+        </div>
+        <span class="auth-top-link">{% if zh %}当前：{% else %}Current:{% endif %} {{ current_mode_label }}</span>
+      </div>
+
+      <div class="auth-mode-choice-grid">
+        <article class="auth-mode-choice {% if current_mode == 'mode_a' %}is-active{% endif %}">
+          <div class="auth-mode-choice-head">
+            <div>
+              <div class="auth-mode-choice-kicker">MultiAgent</div>
+              <h3>{% if zh %}MultiAgent 小说工作台{% else %}MultiAgent Novel Workspace{% endif %}</h3>
+            </div>
+            <span class="auth-mode-choice-state">{% if current_mode == 'mode_a' %}{% if zh %}当前{% else %}Current{% endif %}{% else %}{% if zh %}可用{% else %}Available{% endif %}{% endif %}</span>
+          </div>
+          <p class="auth-mode-choice-copy">{% if zh %}从一句清晰的 Idea 出发，快速进入结构完整、章节齐全的长篇小说生成流程。{% else %}Start from a strong idea prompt and move quickly into a structured long-form generation workflow.{% endif %}</p>
+          <a href="{{ mode_a_url }}" class="auth-mode-choice-cta auth-mode-choice-cta-primary">{% if zh %}打开 MultiAgent{% else %}Open MultiAgent{% endif %}</a>
+          <p class="auth-footnote" style="margin-top:10px;">{{ mode_a_display_url }}</p>
+        </article>
+
+        <article class="auth-mode-choice {% if current_mode == 'mode_b' %}is-active{% endif %}">
+          <div class="auth-mode-choice-head">
+            <div>
+              <div class="auth-mode-choice-kicker">NovelClaw</div>
+              <h3>{% if zh %}NovelClaw 小说工作台{% else %}NovelClaw Workspace{% endif %}</h3>
+            </div>
+            <span class="auth-mode-choice-state">{% if current_mode == 'mode_b' %}{% if zh %}当前{% else %}Current{% endif %}{% else %}{% if zh %}可用{% else %}Available{% endif %}{% endif %}</span>
+          </div>
+          <p class="auth-mode-choice-copy">{% if zh %}更适合章节推进、记忆整理、长线创作和持续性写作打磨。{% else %}Better for chapter progression, memory-aware drafting, and longer-term writing refinement.{% endif %}</p>
+          <a href="{{ mode_b_url }}" class="auth-mode-choice-cta auth-mode-choice-cta-secondary">{% if zh %}打开 NovelClaw{% else %}Open NovelClaw{% endif %}</a>
+          <p class="auth-footnote" style="margin-top:10px;">{{ mode_b_display_url }}</p>
+        </article>
+      </div>
+
+      <div class="auth-link-row auth-link-row-split">
+        <span class="auth-top-link">{% if zh %}预览会话：{% else %}Preview session:{% endif %} {{ preview_session }}</span>
+        <form method="post" action="/logout">
+          <button type="submit" class="auth-inline-link">{% if zh %}重置会话{% else %}Reset session{% endif %}</button>
+        </form>
+      </div>
+    </article>
+  </section>
+</div>
+{% endblock %}

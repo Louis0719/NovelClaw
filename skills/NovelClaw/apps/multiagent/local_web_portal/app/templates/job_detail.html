@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+{% block title %}{{ t("job.page_title", id=job.id) }}{% endblock %}
+{% block content %}
+{% set snapshot = progress_snapshot|default({}, true) %}
+{% set idle_value = snapshot.idle_seconds if snapshot.idle_seconds is defined and snapshot.idle_seconds >= 0 else "-" %}
+{% set chapter_progress = ((snapshot.current_chapter if snapshot.current_chapter is defined and snapshot.current_chapter > 0 else 0) ~ "/" ~ snapshot.planned_total) if snapshot.planned_total is defined and snapshot.planned_total > 0 else "-" %}
+{% set is_zh = locale() == "zh-CN" %}
+{% set memory_title = "动态 Memory 内容" if is_zh else "Dynamic Memory Contents" %}
+{% set memory_subtitle = "直接展示 memory 索引中的最近内容，而不只是计数。" if is_zh else "Show recent entries from the memory index directly instead of only counters." %}
+{% set memory_empty = "当前还没有可展示的 memory 条目。" if is_zh else "No memory entries are available yet." %}
+{% set memory_topic = "主题" if is_zh else "Topic" %}
+{% set memory_time = "时间" if is_zh else "Time" %}
+{% set memory_path_label = "索引路径" if is_zh else "Index path" %}
+{% set chapter_title_template = t("job.chapter_title", chapter="__CHAPTER__") %}
+{% set chapter_download_template = t("job.chapter_download", chapter="__CHAPTER__") %}
+{% set chapter_meta_template = t("job.chapter_meta", iteration="__ITERATION__", filename="__FILENAME__") %}
+{% set percent_value = snapshot.percent if snapshot.percent is defined else 0 %}
+
+<section class="detail-hero detail-hero-job">
+  <div class="detail-hero-copy">
+    <span class="section-eyebrow">{{ "Job Console" if not is_zh else "任务控制台" }}</span>
+    <h1>{{ t("job.heading", id=job.id) }}</h1>
+    <p class="workspace-hero-text">{{ "这一页把任务状态、运行日志、章节输出、Memory 预览和最终结果放到同一个追踪面板里。" if is_zh else "This page keeps runtime state, logs, chapter output, memory preview, and final text inside one tracking surface." }}</p>
+    <div class="hero-pill-row">
+      <span class="hero-pill">{{ t("dashboard.provider") }} {{ job.provider|upper }}</span>
+      <span class="hero-pill">{{ t("job.run_id", value=job.run_id if job.run_id else "-") }}</span>
+      <span class="hero-pill">{{ "章节" if is_zh else "Chapters" }} {{ chapter_outputs|length }}</span>
+    </div>
+    <p class="detail-hero-meta">
+      <span>{{ t("common.status") }} <strong id="job-status" class="pill pill-{{ job.status }}">{{ t("status." ~ job.status) }}</strong></span>
+      <span>{{ t("common.created") }} <strong>{{ job.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</strong></span>
+    </p>
+  </div>
+  <div class="hero-action-row detail-hero-actions">
+    <a class="btn btn-ghost" href="{{ app_path('/jobs') }}">{{ "返回任务页" if is_zh else "Back to jobs" }}</a>
+    <a class="btn btn-ghost" href="{{ app_path('/dashboard') }}">{{ t("common.back_to_dashboard") }}</a>
+    <a class="btn btn-outline" href="{{ app_path('/jobs/' ~ job.id ~ '/download/output') }}">{{ t("job.download_output") }}</a>
+    <a class="btn btn-outline" href="{{ app_path('/jobs/' ~ job.id ~ '/download/chapters') }}">{{ t("job.download_chapters") }}</a>
+    {% if job.status in ["queued", "running"] %}
+    <form method="post" action="{{ app_path('/jobs/' ~ job.id ~ '/cancel') }}" class="inline-form" onsubmit="return confirm({{ t('job.confirm_cancel_job')|tojson }});">
+      <input type="hidden" name="next" value="{{ current_public_path(request) }}">
+      <button type="submit" class="btn btn-primary">{{ t("job.cancel_this_job") }}</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="metric-ribbon">
+  <article class="metric-card">
+    <span>{{ t("job.execution_status") }}</span>
+    <strong id="phase-label">{{ snapshot.phase_label if snapshot.phase_label is defined else "-" }}</strong>
+    <small id="phase-note">{{ snapshot.phase_note if snapshot.phase_note is defined and snapshot.phase_note else "-" }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ "耗时 / 空闲" if is_zh else "Elapsed / idle" }}</span>
+    <strong><span id="elapsed-seconds">{{ snapshot.elapsed_seconds if snapshot.elapsed_seconds is defined else 0 }}</span>s / <span id="idle-seconds">{{ idle_value }}</span>s</strong>
+    <small>{{ "任务运行期间会持续刷新" if is_zh else "Continuously refreshed while the worker is alive" }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ "章节进度" if is_zh else "Chapter progress" }}</span>
+    <strong id="chapter-progress">{{ chapter_progress }}</strong>
+    <small><span id="chapter-words">{{ snapshot.chapter_words if snapshot.chapter_words is defined else 0 }}</span> / <span id="total-words">{{ snapshot.total_words if snapshot.total_words is defined else 0 }}</span> {{ "字" if is_zh else "words" }}</small>
+  </article>
+  <article class="metric-card">
+    <span>{{ "进度信号" if is_zh else "Progress signal" }}</span>
+    <strong>{{ percent_value }}%</strong>
+    <small>{{ "根据心跳、日志和检查点推断出来的运行把握度" if is_zh else "Estimated from heartbeat, logs, and checkpoints" }}</small>
+  </article>
+</section>
+
+<section class="detail-command-deck">
+  <article class="detail-command-card">
+    <div class="command-deck-head">
+      <div>
+        <span class="section-eyebrow">{{ "Mission Brief" if not is_zh else "任务简报" }}</span>
+        <h2>{{ t("job.job_input") }}</h2>
+      </div>
+    </div>
+    <div class="command-card-surface">
+      <p>{{ job.idea }}</p>
+      <div class="signal-list">
+        <div class="signal-row">
+          <span>{{ "输出路径" if is_zh else "Output path" }}</span>
+          <strong>{{ job.output_path if job.output_path else "-" }}</strong>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="detail-command-card">
+    <div class="command-deck-head">
+      <div>
+        <span class="section-eyebrow">{{ "Runtime Coordinates" if not is_zh else "运行坐标" }}</span>
+        <h2>{{ "运行信号" if is_zh else "Run signal" }}</h2>
+      </div>
+    </div>
+    <div class="signal-list">
+      <div class="signal-row">
+        <span>{{ t("job.execution_status") }}</span>
+        <strong>{{ snapshot.phase_label if snapshot.phase_label is defined else "-" }}</strong>
+      </div>
+      <div class="signal-row">
+        <span>{{ "Run ID" if not is_zh else "运行 ID" }}</span>
+        <strong>{{ job.run_id if job.run_id else "-" }}</strong>
+      </div>
+      <div class="signal-row">
+        <span>{{ "当前动作" if is_zh else "Current note" }}</span>
+        <strong id="phase-note-inline">{{ snapshot.phase_note if snapshot.phase_note is defined and snapshot.phase_note else "-" }}</strong>
+      </div>
+    </div>
+  </article>
+
+  <article class="detail-command-card">
+    <div class="command-deck-head">
+      <div>
+        <span class="section-eyebrow">{{ "Artifacts" if not is_zh else "产物总览" }}</span>
+        <h2>{{ "结果概况" if is_zh else "Result overview" }}</h2>
+      </div>
+    </div>
+    <div class="signal-list">
+      <div class="signal-row">
+        <span>{{ "章节文件" if is_zh else "Chapter files" }}</span>
+        <strong>{{ chapter_outputs|length }}</strong>
+      </div>
+      <div class="signal-row">
+        <span>{{ "Memory 分组" if is_zh else "Memory groups" }}</span>
+        <strong>{{ memory_preview.groups|length if memory_preview and memory_preview.groups else 0 }}</strong>
+      </div>
+      <div class="signal-row">
+        <span>{{ "最终结果" if is_zh else "Final output" }}</span>
+        <strong>{% if output_text %}{{ "已生成" if is_zh else "Ready" }}{% else %}{{ "待生成" if is_zh else "Pending" }}{% endif %}</strong>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="workspace-grid detail-grid">
+  <div class="workspace-main-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Runtime" if not is_zh else "运行状态" }}</span>
+          <h2>{{ t("job.execution_status") }}</h2>
+        </div>
+      </div>
+      <div class="status-board">
+        <div class="status-board-copy">
+          <p class="muted">{{ t("job.current_action", value='<strong>' ~ (snapshot.phase_note if snapshot.phase_note is defined and snapshot.phase_note else "-") ~ '</strong>')|safe }}</p>
+          <div class="runtime-signal-grid">
+            <div class="runtime-signal-card">
+              <span>{{ t("common.outlines") }}</span>
+              <strong id="mc-outlines">{{ snapshot.memory_counts.outlines if snapshot.memory_counts is defined and snapshot.memory_counts else 0 }}</strong>
+            </div>
+            <div class="runtime-signal-card">
+              <span>{{ t("common.texts") }}</span>
+              <strong id="mc-texts">{{ snapshot.memory_counts.texts if snapshot.memory_counts is defined and snapshot.memory_counts else 0 }}</strong>
+            </div>
+            <div class="runtime-signal-card">
+              <span>{{ t("common.characters") }}</span>
+              <strong id="mc-characters">{{ snapshot.memory_counts.characters if snapshot.memory_counts is defined and snapshot.memory_counts else 0 }}</strong>
+            </div>
+            <div class="runtime-signal-card">
+              <span>{{ t("common.worlds") }}</span>
+              <strong id="mc-worlds">{{ snapshot.memory_counts.world_settings if snapshot.memory_counts is defined and snapshot.memory_counts else 0 }}</strong>
+            </div>
+            <div class="runtime-signal-card">
+              <span>{{ t("common.facts") }}</span>
+              <strong id="mc-facts">{{ snapshot.memory_counts.fact_cards if snapshot.memory_counts is defined and snapshot.memory_counts else 0 }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="progress-track progress-track-lg">
+          <div id="progress-bar" class="progress-bar" style="width: {{ percent_value }}%;"></div>
+        </div>
+        <p id="stall-hint" class="muted stall-hint {% if not snapshot.stalled %}hidden{% endif %}">{{ snapshot.stall_reason if snapshot.stalled else "" }}</p>
+      </div>
+    </article>
+
+    <section class="panel-split panel-split-wide detail-log-grid">
+      <article class="feature-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="section-eyebrow">{{ "Worker Feed" if not is_zh else "Worker 输出" }}</span>
+            <h2>{{ t("job.live_progress") }}</h2>
+          </div>
+          <p class="muted panel-copy">{{ t("job.live_progress_subtitle") }}</p>
+        </div>
+        <pre id="worker-log" class="log-box">{{ worker_log_text if worker_log_text else t("job.no_worker_log") }}</pre>
+      </article>
+
+      <article class="feature-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="section-eyebrow">{{ "System Feed" if not is_zh else "进度记录" }}</span>
+            <h2>{{ t("job.progress_log") }}</h2>
+          </div>
+        </div>
+        <pre id="progress-log" class="log-box">{{ progress_log_text if progress_log_text else t("job.no_progress_log") }}</pre>
+      </article>
+    </section>
+
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Chapter Stream" if not is_zh else "章节流" }}</span>
+          <h2>{{ t("job.chapter_results") }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ t("job.chapter_results_subtitle") }}</p>
+      </div>
+      <div id="chapters-wrap" class="chapter-stream">
+        {% if chapter_outputs %}
+          {% for ch in chapter_outputs %}
+          <article class="chapter-item chapter-card">
+            <div class="chapter-card-head">
+              <div>
+                <h3>{{ t("job.chapter_title", chapter=ch.chapter) }}</h3>
+                <p class="muted">{{ t("job.chapter_meta", iteration=ch.iteration, filename=ch.filename) }}</p>
+              </div>
+              <a class="btn btn-outline btn-xs" href="{{ app_path('/jobs/' ~ job.id ~ '/download/chapter/' ~ ch.chapter) }}">{{ t("job.chapter_download", chapter=ch.chapter) }}</a>
+            </div>
+            <pre class="chapter-box" data-chapter="{{ ch.chapter }}">{{ ch.content }}</pre>
+          </article>
+          {% endfor %}
+        {% else %}
+          <p id="chapters-empty" class="muted">{{ t("job.no_chapter_output") }}</p>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+
+  <aside class="workspace-side-stack">
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Memory Index" if not is_zh else "Memory 索引" }}</span>
+          <h2>{{ memory_title }}</h2>
+        </div>
+        <p class="muted panel-copy">{{ memory_subtitle }}</p>
+      </div>
+      {% if memory_preview and memory_preview.groups %}
+      <p class="muted">{{ memory_path_label }}: {{ memory_preview.index_path }}</p>
+      <div class="memory-preview-grid">
+        {% for group in memory_preview.groups %}
+        <article class="memory-preview-card">
+          <div class="memory-preview-head">
+            <strong>{{ group.label }}</strong>
+            <span class="pill">{{ group.count }}</span>
+          </div>
+          {% if group.entries %}
+            {% for entry in group.entries %}
+            <div class="memory-preview-entry">
+              {% if entry.topic %}
+              <div class="memory-preview-topic">{{ memory_topic }}: {{ entry.topic }}</div>
+              {% endif %}
+              <div class="memory-preview-body">{{ entry.preview or "-" }}</div>
+              {% if entry.timestamp %}
+              <div class="memory-preview-time">{{ memory_time }}: {{ entry.timestamp }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="muted">{{ memory_empty }}</div>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><strong>{{ memory_empty }}</strong></div>
+      {% endif %}
+    </article>
+
+    {% if job.error_message %}
+    <article class="feature-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Failure Trace" if not is_zh else "错误轨迹" }}</span>
+          <h2>{{ t("job.error_title") }}</h2>
+        </div>
+      </div>
+      <pre class="error-block">{{ job.error_message }}</pre>
+    </article>
+    {% endif %}
+
+    <article class="feature-panel">
+      {% if output_text %}
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Final Output" if not is_zh else "最终结果" }}</span>
+          <h2>{{ t("job.generated_text") }}</h2>
+        </div>
+      </div>
+      <div class="output-box">{{ output_text }}</div>
+      {% else %}
+      <div class="panel-heading">
+        <div>
+          <span class="section-eyebrow">{{ "Result" if not is_zh else "结果状态" }}</span>
+          <h2>{{ t("job.result_title") }}</h2>
+        </div>
+      </div>
+      <div class="empty-state"><strong>{{ t("job.no_output_yet") }}</strong></div>
+      {% endif %}
+    </article>
+  </aside>
+</section>
+
+<script>
+  (function () {
+    const I18N = window.PORTAL_I18N || {};
+    const CHAPTER_TITLE_TEMPLATE = {{ chapter_title_template|tojson }};
+    const CHAPTER_META_TEMPLATE = {{ chapter_meta_template|tojson }};
+    const CHAPTER_DOWNLOAD_TEMPLATE = {{ chapter_download_template|tojson }};
+    const jobId = {{ job.id }};
+    const workerBox = document.getElementById("worker-log");
+    const progressBox = document.getElementById("progress-log");
+    const statusEl = document.getElementById("job-status");
+    const chaptersWrap = document.getElementById("chapters-wrap");
+    const phaseLabelEl = document.getElementById("phase-label");
+    const phaseNoteEl = document.getElementById("phase-note");
+    const phaseNoteInlineEl = document.getElementById("phase-note-inline");
+    const elapsedEl = document.getElementById("elapsed-seconds");
+    const idleEl = document.getElementById("idle-seconds");
+    const chapterProgressEl = document.getElementById("chapter-progress");
+    const chapterWordsEl = document.getElementById("chapter-words");
+    const totalWordsEl = document.getElementById("total-words");
+    const progressBarEl = document.getElementById("progress-bar");
+    const stallHintEl = document.getElementById("stall-hint");
+    const mcOutlinesEl = document.getElementById("mc-outlines");
+    const mcTextsEl = document.getElementById("mc-texts");
+    const mcCharactersEl = document.getElementById("mc-characters");
+    const mcWorldsEl = document.getElementById("mc-worlds");
+    const mcFactsEl = document.getElementById("mc-facts");
+
+    let lastChaptersSignature = "";
+    let pollTimer = null;
+    let pollInFlight = false;
+    let autoRefreshEnabled = ["queued", "running"].includes("{{ job.status }}");
+
+    function tt(key, params) {
+      let text = I18N[key] || key;
+      if (!params) return text;
+      Object.keys(params).forEach((name) => {
+        text = text.replaceAll(`{${name}}`, String(params[name]));
+      });
+      return text;
+    }
+
+    function applyTemplate(template, params) {
+      let text = String(template || "");
+      Object.keys(params || {}).forEach((name) => {
+        text = text.replaceAll(`__${String(name).toUpperCase()}__`, String(params[name]));
+        text = text.replaceAll(`{${name}}`, String(params[name]));
+      });
+      return text;
+    }
+
+    function updateStatusClass(status) {
+      if (!statusEl) return;
+      statusEl.className = "pill pill-" + status;
+      statusEl.textContent = tt(`status.${status}`);
+    }
+
+    function updateLogBox(el, text, emptyLabel) {
+      if (!el) return;
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+      el.textContent = text || emptyLabel;
+      if (nearBottom) {
+        el.scrollTop = el.scrollHeight;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function buildChaptersSignature(chapters) {
+      if (!chapters || chapters.length === 0) return "";
+      return chapters.map((ch) => {
+        const chapter = ch.chapter ?? "";
+        const iter = ch.iteration ?? "";
+        const filename = ch.filename || "";
+        const length = (ch.content || "").length;
+        return `${chapter}:${iter}:${filename}:${length}`;
+      }).join("|");
+    }
+
+    function captureChapterScrollPositions() {
+      const map = {};
+      if (!chaptersWrap) return map;
+      chaptersWrap.querySelectorAll(".chapter-box[data-chapter]").forEach((el) => {
+        const chapter = el.getAttribute("data-chapter");
+        if (chapter) map[chapter] = el.scrollTop;
+      });
+      return map;
+    }
+
+    function restoreChapterScrollPositions(scrollMap) {
+      if (!chaptersWrap) return;
+      chaptersWrap.querySelectorAll(".chapter-box[data-chapter]").forEach((el) => {
+        const chapter = el.getAttribute("data-chapter");
+        if (chapter && Object.prototype.hasOwnProperty.call(scrollMap, chapter)) {
+          el.scrollTop = scrollMap[chapter];
+        }
+      });
+    }
+
+    function renderChapters(chapters) {
+      if (!chaptersWrap) return;
+      const signature = buildChaptersSignature(chapters);
+      if (signature === lastChaptersSignature) return;
+      const chapterBoxScroll = captureChapterScrollPositions();
+
+      if (!chapters || chapters.length === 0) {
+        chaptersWrap.innerHTML = `<p id="chapters-empty" class="muted">${escapeHtml(tt("job.no_chapter_output"))}</p>`;
+        lastChaptersSignature = signature;
+        return;
+      }
+
+      chaptersWrap.innerHTML = chapters.map((ch) => {
+        const chapterNo = Number(ch.chapter || 0);
+        const title = applyTemplate(CHAPTER_TITLE_TEMPLATE, { chapter: chapterNo || "?" });
+        const meta = applyTemplate(CHAPTER_META_TEMPLATE, { iteration: Number(ch.iteration || 0), filename: ch.filename || "" });
+        const downloadHref = chapterNo > 0 ? `${window.PORTAL_BASE_PATH || ""}/jobs/${jobId}/download/chapter/${chapterNo}` : "#";
+        const downloadLabel = chapterNo > 0 ? applyTemplate(CHAPTER_DOWNLOAD_TEMPLATE, { chapter: chapterNo }) : tt("job.chapter_download_fallback");
+        return `<article class="chapter-item chapter-card"><div class="chapter-card-head"><div><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(meta)}</p></div><a class="btn btn-outline btn-xs" href="${downloadHref}">${escapeHtml(downloadLabel)}</a></div><pre class="chapter-box" data-chapter="${chapterNo}">${escapeHtml(ch.content || "")}</pre></article>`;
+      }).join("");
+
+      restoreChapterScrollPositions(chapterBoxScroll);
+      lastChaptersSignature = signature;
+    }
+
+    function renderSnapshot(snapshot) {
+      if (!snapshot) return;
+      if (phaseLabelEl) phaseLabelEl.textContent = snapshot.phase_label || "-";
+      if (phaseNoteEl) phaseNoteEl.textContent = snapshot.phase_note || "-";
+      if (phaseNoteInlineEl) phaseNoteInlineEl.textContent = snapshot.phase_note || "-";
+      if (elapsedEl) elapsedEl.textContent = String(snapshot.elapsed_seconds ?? 0);
+      if (idleEl) idleEl.textContent = snapshot.idle_seconds >= 0 ? String(snapshot.idle_seconds) : "-";
+      if (chapterProgressEl) {
+        const cur = snapshot.current_chapter || 0;
+        const total = Number(snapshot.planned_total || 0);
+        chapterProgressEl.textContent = total > 0 ? `${cur}/${total}` : "-";
+      }
+      if (chapterWordsEl) chapterWordsEl.textContent = String(snapshot.chapter_words ?? 0);
+      if (totalWordsEl) totalWordsEl.textContent = String(snapshot.total_words ?? 0);
+      if (progressBarEl) progressBarEl.style.width = `${Math.max(0, Math.min(100, Number(snapshot.percent || 0)))}%`;
+      const mc = snapshot.memory_counts || {};
+      if (mcOutlinesEl) mcOutlinesEl.textContent = String(mc.outlines ?? 0);
+      if (mcTextsEl) mcTextsEl.textContent = String(mc.texts ?? 0);
+      if (mcCharactersEl) mcCharactersEl.textContent = String(mc.characters ?? 0);
+      if (mcWorldsEl) mcWorldsEl.textContent = String(mc.world_settings ?? 0);
+      if (mcFactsEl) mcFactsEl.textContent = String(mc.fact_cards ?? 0);
+      if (stallHintEl) {
+        if (snapshot.stalled) {
+          stallHintEl.classList.remove("hidden");
+          stallHintEl.textContent = snapshot.stall_reason || tt("job.stall_default");
+        } else {
+          stallHintEl.classList.add("hidden");
+          stallHintEl.textContent = "";
+        }
+      }
+    }
+
+    async function pollChapters() {
+      try {
+        const resp = await fetch(`${window.PORTAL_BASE_PATH || ""}/jobs/${jobId}/chapters`, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`chapters:${resp.status}`);
+        const data = await resp.json();
+        renderChapters(data.chapters || []);
+      } catch (err) {
+      }
+    }
+
+    function scheduleNextPoll(delay = 2000) {
+      if (!autoRefreshEnabled) return;
+      if (pollTimer) window.clearTimeout(pollTimer);
+      pollTimer = window.setTimeout(pollLogs, delay);
+    }
+
+    async function pollLogs() {
+      if (!autoRefreshEnabled || pollInFlight) return;
+      pollInFlight = true;
+      try {
+        const resp = await fetch(`${window.PORTAL_BASE_PATH || ""}/jobs/${jobId}/logs`, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`logs:${resp.status}`);
+        const data = await resp.json();
+        updateLogBox(workerBox, data.worker_log, tt("job.no_worker_log"));
+        updateLogBox(progressBox, data.progress_log, tt("job.no_progress_log"));
+        updateStatusClass(data.status || "unknown");
+        if (data.progress_snapshot) renderSnapshot(data.progress_snapshot);
+        await pollChapters();
+        if (["succeeded", "failed", "canceled"].includes(data.status)) {
+          autoRefreshEnabled = false;
+          setTimeout(() => window.location.reload(), 1000);
+          return;
+        }
+      } catch (err) {
+      } finally {
+        pollInFlight = false;
+      }
+      scheduleNextPoll();
+    }
+
+    renderSnapshot({{ snapshot|tojson }});
+    renderChapters({{ chapter_outputs|tojson }});
+    lastChaptersSignature = buildChaptersSignature({{ chapter_outputs|tojson }});
+
+    if (autoRefreshEnabled) {
+      pollLogs();
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && autoRefreshEnabled) scheduleNextPoll(100);
+      });
+      window.addEventListener("focus", () => {
+        if (autoRefreshEnabled) scheduleNextPoll(100);
+      });
+      window.addEventListener("online", () => {
+        if (autoRefreshEnabled) scheduleNextPoll(100);
+      });
+    }
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+{"id": "q1", "question": "What is the capital of France?", "context": "France is a country in Western Europe. Its capital and largest city is Paris.", "answers": ["Paris"]}
+{"id": "q2", "question": "What is 2+2?", "context": "Basic arithmetic: 2+2 equals 4.", "answers": ["4"]}
+{"id": "q3", "question": "Who wrote Hamlet?", "context": "Hamlet is a tragedy written by William Shakespeare around 1600.", "answers": ["William Shakespeare", "Shakespeare"]}
+{"id": "q4", "question": "What is the chemical symbol for water?", "context": "Water is H2O. The chemical formula is dihydrogen monoxide.", "answers": ["H2O"]}
+{"id": "q5", "question": "What planet is known as the Red Planet?", "context": "Mars is called the Red Planet due to iron oxide on its surface.", "answers": ["Mars"]}
