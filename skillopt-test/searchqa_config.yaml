@@ -1,0 +1,59 @@
+# SkillOpt 配置 — MiniMax 后端
+# API key 从环境变量 MINIMAX_API_KEY 读取
+
+model:
+  backend: minimax_chat
+  optimizer: MiniMax-M2.7-highspeed
+  target: MiniMax-M2.7-highspeed
+  optimizer_backend: minimax_chat
+  target_backend: minimax_chat
+  reasoning_effort: medium
+  rewrite_reasoning_effort: ""
+  rewrite_max_completion_tokens: 16000
+  # MiniMax（key从环境变量MINIMAX_API_KEY读取，base URL使用正确的.chat域名）
+  minimax_base_url: "https://api.minimax.chat/v1"
+  minimax_model: "MiniMax-M2.7-highspeed"
+  minimax_temperature: "0.7"
+  minimax_max_tokens: "8000"
+  minimax_enable_thinking: "false"
+
+train:
+  num_epochs: 2
+  train_size: 0
+  batch_size: 10
+  accumulation: 1
+  seed: 42
+
+gradient:
+  minibatch_size: 4
+  merge_batch_size: 4
+  analyst_workers: 4
+  max_analyst_rounds: 1
+  failure_only: true
+
+optimizer:
+  learning_rate: 2
+  min_learning_rate: 1
+  lr_scheduler: constant
+  lr_control_mode: fixed
+  skill_update_mode: patch
+  use_slow_update: false
+  slow_update_samples: 0
+  use_meta_skill: false
+  use_skill_aware_reflection: false
+
+evaluation:
+  use_gate: true
+  sel_env_num: 0
+  test_env_num: 0
+  eval_test: false
+
+env:
+  name: "searchqa"
+  skill_init: ""
+  split_mode: ratio
+  split_seed: 42
+  data_path: ""
+  split_dir: ""
+  exec_timeout: 120
+  out_root: "./outputs"
