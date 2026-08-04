@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}WriteClaw Console{% endblock %}</title>
+  <title>{% block title %}{{ ui_text('墨枢创作台', '墨枢 Studio') }}{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -32,10 +32,10 @@
       <div>
         <div class="console-sidebar-head">
           <a href="{{ app_path('/console/chat') }}{{ session_suffix }}" class="console-brand">
-            <div class="console-brand-logo">WC</div>
+            <div class="console-brand-logo">墨</div>
             <div>
-              <div class="console-brand-title">WriteClaw</div>
-              <div class="console-brand-subtitle">{{ ui_texts.brand_subtitle }}</div>
+              <div class="console-brand-title">墨枢</div>
+              <div class="console-brand-subtitle">{{ ui_texts.brand_subtitle or ui_text('中文网文爆款工作台', 'Chinese Web Fiction Studio') }}</div>
             </div>
           </a>
           <button type="button" class="sidebar-toggle" data-sidebar-toggle aria-label="Toggle sidebar" aria-pressed="false">≡</button>

@@ -10,11 +10,11 @@
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-111827?style=for-the-badge" alt="MIT License"></a>
   </p>
 
-  <h3>✨ A structured long-form fiction workspace centered on chapter drafting, inspectable runs, manuscript review, and memory-aware writing control.</h3>
+  <h3>✨ Writing a long novel? The scariest part isn't running out of ideas — it's forgetting what you wrote.</h3>
 
 
   <p>
-    💡 NovelClaw is not a one-shot prompt wrapper. It turns long-form fiction work into an inspectable writing workspace with sessions, storyboards, manuscript surfaces, character and world views, and editable memory banks.
+    💡 NovelClaw is the first long-form memory tool designed for fiction authors — it <strong>remembers every character detail, plot thread, and power system</strong> across all your chapters, so your 1M-word story stays consistent from start to finish.
   </p>
 
   <p>
@@ -59,30 +59,36 @@ https://github.com/user-attachments/assets/f768395f-0d6e-471f-826d-62aed266fd0e
   <sub>Demo showcase of the NovelClaw workspace.</sub>
 </p>
 
-`NovelClaw` is the core writing workspace in this GitHub-safe public bundle. While `Portal` provides a clean public entry path and `MultiAgent` offers an optional faster ideation lane, the sustained long-form writing experience is concentrated in NovelClaw itself.
+Long-form fiction authors hit three walls:
 
-Instead of treating long-form fiction as a single prompt submission, NovelClaw organizes work into ongoing sessions, run inspection, manuscript review, storyboard development, and memory-aware writing control.
+**Wall 1: Character Drift** — By Chapter 80, the protagonist's personality from Chapter 3 is completely gone. Readers notice immediately.
 
-That makes it a better fit for authors and builders who want stronger continuity, clearer iteration surfaces, and more direct control over chapter-level progress. 🎯
+**Wall 2: Plot Threads Unresolved** — You planted 15 hooks in the opening. At the finale, you've forgotten 10 of them. Comments say "author never paid off this subplot."
 
-- 📚 long-form fiction, serial writing, and chapter-by-chapter continuation.
-- 🧠 memory-aware drafting with inspectable chapter output and reusable story state.
-- 🤝 human-in-the-loop writing workflows with persistent control surfaces.
-- 🔍 observable runs with logs, progress traces, chapters, downloads, and review pages.
+**Wall 3: Power System Collapse** — The Foundation Establishment realm can defeat the Golden Core realm. Then the Golden Core realm loses to the Qi Refining realm. Readers call you "mathematically challenged."
+
+NovelClaw solves all three. It turns long-form writing into ongoing sessions, persistent memory, and chapter-level control — so you can look up any character detail, review any plot thread, or check any power rule at any point in your story.
+
+- 📚 long-form fiction, serial writing, and chapter-by-chapter continuation
+- 🧠 <strong>Memory Bank</strong>: store character profiles, world rules, plot notes — searchable across all chapters
+- 📋 <strong>Storyboard</strong>: visual map of all plot threads, resolved or still open
+- ⚔️ <strong>World Interface</strong>: lock in power systems and realm hierarchies so AI output respects them
+- 🤝 human-in-the-loop writing workflows with persistent control surfaces
+- 🔍 observable runs with logs, progress traces, chapters, downloads, and review pages
 
 <table>
   <tr>
     <td width="33%" valign="top">
-      <h3>✍️ Writing Workspace</h3>
-      <p>NovelClaw keeps conversation, chapter drafting, run review, and continuation work inside one main workspace instead of scattering them across separate tools.</p>
+      <h3>🧠 Memory Bank</h3>
+      <p>Store every character detail, world rule, and plot note in an editable memory bank. Search it in 3 seconds at any chapter — no need to scroll back to the beginning.</p>
     </td>
     <td width="33%" valign="top">
-      <h3>🗂️ Manuscript Surfaces</h3>
-      <p>Storyboards, manuscript views, style panels, world panels, and character surfaces remain visible as working material instead of becoming hidden intermediate output.</p>
+      <h3>📋 Storyboard Thread Tracker</h3>
+      <p>Visualize every plot hook you've planted. See at a glance which ones are resolved and which are still dangling — no more forgotten payoffs at the finale.</p>
     </td>
     <td width="33%" valign="top">
-      <h3>🧠 Memory Control</h3>
-      <p>Editable memory banks, run-linked artifacts, and chapter outputs give you a concrete surface for continuity, revision, and reuse across longer projects.</p>
+      <h3>⚔️ Power System Lock</h3>
+      <p>Write your realm hierarchy and power rules into the World interface. The AI follows them automatically — no Foundation-beats-Golden-Core inconsistencies.</p>
     </td>
   </tr>
 </table>
@@ -101,13 +107,13 @@ NovelClaw is built around a simple claim: long-form writing quality improves whe
   <img src="docs/dynamic-memory.png" alt="NovelClaw workflow across chapters, memory, and inspectable outputs" width="100%">
 </p>
 
-| Typical fiction tool flow | NovelClaw |
+| Common writing pain | NovelClaw solution |
 |---|---|
-| Treats long-form writing as one large prompt | Treats long-form writing as an ongoing workspace with sessions and run inspection |
-| Hides execution state behind opaque generation | Exposes worker output, `progress.log`, chapter files, downloads, and job detail views |
-| Leaves story state scattered across temporary prompts | Keeps manuscript surfaces, world and character views, and memory banks inside the workspace |
-| Makes continuation control difficult after the first draft | Supports repeated return through sessions, storyboard views, manuscript review, and chapter monitoring |
-| Publishes public bundles with mixed local leftovers | Pairs the workspace with GitHub-safe packaging, safe env templates, and deployment references |
+| "I forgot what happened in earlier chapters" | Memory Bank persists across all chapters — look up Ch.3 character details from Ch.180 |
+| Planted 15 plot hooks, forgot 10 at the finale | Storyboard visualizes every thread — resolved or dangling,一眼看清 |
+| Power system falls apart mid-story | World Interface locks in realm rules — AI auto-respects them |
+| No idea where AI changed things | Run Inspection exposes worker.log + progress.log — every edit transparent |
+| Switching tools means losing all your data | Local-first: your data stays on your machine, no platform lock-in |
 
 ### NovelClaw In Practice 🧠
 

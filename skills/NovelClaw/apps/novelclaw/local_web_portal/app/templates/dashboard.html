@@ -1,5 +1,5 @@
 ﻿{% extends "base.html" %}
-{% block title %}{{ ui_text('对话工作台', 'Conversation Workspace') }} | WriteClaw{% endblock %}
+{% block title %}{{ ui_text('对话工作台', 'Conversation Workspace') }} | 墨枢{% endblock %}
 {% block content %}
 {% set session_suffix = '?session_id=' ~ active_session.id if active_session else '' %}
 <section class="chat-console-layout chat-console-layout--focus"
@@ -10,15 +10,15 @@
   data-reply-pending="{{ 'true' if session_state.reply_pending else 'false' }}"
   data-label-you="{{ ui_text('你', 'You') }}"
   data-label-thinking="{{ ui_text('正在思考', 'Thinking') }}"
-  data-label-analysis-title="{{ ui_text('WriteClaw 分析', 'WriteClaw analysis') }}"
+  data-label-analysis-title="{{ ui_text('墨枢分析', '墨枢分析') }}"
   data-label-next-questions="{{ ui_text('下一步问题', 'Next questions') }}"
   data-label-current-brief="{{ ui_text('当前简报', 'Current brief') }}"
   data-label-next-answers="{{ ui_text('建议补充', 'Suggested next answers') }}"
   data-label-readiness="{{ ui_text('准备度', 'Readiness') }}"
   data-label-no-conversation="{{ ui_text('还没有对话记录。', 'No conversation yet.') }}"
   data-label-empty-title="{{ ui_text('开始新会话', 'Start a new conversation') }}"
-  data-label-empty-body="{{ ui_text('输入目标后，WriteClaw 会在这里持续协作。', 'WriteClaw will keep working here after you send the goal.') }}"
-  data-label-continuing="{{ ui_text('WriteClaw 正在继续处理...', 'WriteClaw is continuing...') }}"
+  data-label-empty-body="{{ ui_text('输入目标后，墨枢会在这里持续协作。', '墨枢会在这里持续协作.') }}"
+  data-label-continuing="{{ ui_text('墨枢正在继续处理...', '墨枢正在继续...') }}"
   data-label-run-started="{{ ui_text('正式写作已启动，正在切换到实时运行视图...', 'The writing run has started. Switching to live run view...') }}"
   {% endif %}>
   <div class="chat-stage chat-stage-full">
@@ -185,7 +185,7 @@
                     <div class="avatar-circle">WC</div>
                     <div class="assistant-panel">
                       <div class="assistant-section">
-                        <div class="assistant-title">{{ ui_text('WriteClaw 分析', 'WriteClaw analysis') }}</div>
+                        <div class="assistant-title">{{ ui_text('墨枢分析', '墨枢分析') }}</div>
                         <div class="assistant-text">{{ msg.analysis }}</div>
                       </div>
                       {% if msg.questions %}
@@ -234,7 +234,7 @@
             {% if chat_session and chat_session.status == 'active' and not compose_new %}
             <form method="post" action="{{ app_path('/idea-copilot/' ~ chat_session.id ~ '/reply') }}" class="chat-input-form chat-input-form--floating" data-idea-reply-form>
               <div data-idea-status class="console-alert" hidden></div>
-              <textarea name="reply" rows="4" required placeholder="{{ ui_text('继续补充要求、修改方向，或者直接告诉 WriteClaw 下一步做什么。', 'Add details, change direction, or tell WriteClaw what to do next.') }}"></textarea>
+              <textarea name="reply" rows="4" required placeholder="{{ ui_text('继续补充要求、修改方向，或者直接告诉墨枢下一步做什么。', 'Add details, change direction, or tell 墨枢 what to do next.') }}"></textarea>
               <div class="chat-input-actions">
                 <button type="submit" class="primary-btn">{{ ui_text('发送', 'Send') }}</button>
                 <a href="{{ app_path('/console/chat') }}?new=1" class="ghost-btn">{{ ui_text('新建会话', 'New conversation') }}</a>
@@ -326,7 +326,7 @@
 
       function appendPending() {
         if (feed.querySelector('[data-pending-row="1"]')) return;
-        feed.insertAdjacentHTML('beforeend', '<div class="chat-row assistant is-pending" data-pending-row="1"><div class="avatar-circle">WC</div><div class="assistant-panel"><div class="assistant-section"><div class="assistant-title">' + (root.dataset.labelAnalysisTitle || 'WriteClaw analysis') + '</div><div class="assistant-text typing-dots">' + (root.dataset.labelThinking || 'Thinking') + '</div></div></div></div>');
+        feed.insertAdjacentHTML('beforeend', '<div class="chat-row assistant is-pending" data-pending-row="1"><div class="avatar-circle">WC</div><div class="assistant-panel"><div class="assistant-section"><div class="assistant-title">' + (root.dataset.labelAnalysisTitle || '墨枢分析') + '</div><div class="assistant-text typing-dots">' + (root.dataset.labelThinking || 'Thinking') + '</div></div></div></div>');
         feed.scrollTop = feed.scrollHeight;
       }
 
@@ -353,7 +353,7 @@
               var latest = messages.length ? String(messages[messages.length - 1].role || '') : '';
               if (data.reply_pending || latest === 'user') {
                 appendPending();
-                setStatus('ok', root.dataset.labelContinuing || 'WriteClaw is continuing...');
+                setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
                 return;
               }
               window.clearInterval(timer);
@@ -386,7 +386,7 @@
           .then(readPayload)
           .then(function (data) {
             if (!data || !data.ok) throw new Error((data && (data.error || data.detail)) || 'Submit failed');
-            setStatus('ok', root.dataset.labelContinuing || 'WriteClaw is continuing...');
+            setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
             pollState();
           })
           .catch(function (error) {
@@ -398,7 +398,7 @@
       if (root.dataset.replyPending === 'true' || latestVisibleMessageIsUser()) {
         setBusy(true);
         appendPending();
-        setStatus('ok', root.dataset.labelContinuing || 'WriteClaw is continuing...');
+        setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
         pollState();
       }
       return true;

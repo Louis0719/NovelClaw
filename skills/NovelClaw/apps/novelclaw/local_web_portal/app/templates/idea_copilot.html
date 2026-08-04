@@ -1,5 +1,5 @@
 ﻿{% extends "base.html" %}
-{% block title %}{{ ui_text('创意打磨', 'Idea Refinement') }} #{{ session_data.id }} | NovelClaw{% endblock %}
+{% block title %}{{ ui_text('创意打磨', 'Idea Refinement') }} #{{ session_data.id }} | 墨枢{% endblock %}
 {% block page_title %}{{ ui_text('创意打磨会话', 'Idea Refinement Session') }}{% endblock %}
 {% block page_subtitle %}{{ ui_text('把 AI 对话与创意打磨整合进同一个工作区。', 'Bring AI chat and idea refinement into one workspace.') }}{% endblock %}
 {% block content %}
@@ -10,7 +10,7 @@
 <div class="alert alert-error">{{ error }}</div>
 {% endif %}
 
-<div data-idea-copilot-root data-layout="detail" data-session-id="{{ session_data.id }}" data-reply-pending="{{ 'true' if session_state.reply_pending else 'false' }}" data-label-you="{{ ui_text('你', 'You') }}" data-label-thinking="{{ ui_text('正在思考', 'Thinking') }}" data-label-analysis-title="{{ ui_text('NovelClaw 分析', 'NovelClaw analysis') }}" data-label-next-questions="{{ ui_text('下一步问题', 'Next questions') }}" data-label-current-brief="{{ ui_text('当前写作简报', 'Current writing brief') }}" data-label-next-answers="{{ ui_text('建议下一步回答：', 'Suggested next answers:') }}" data-label-readiness="{{ ui_text('准备度', 'Readiness') }}" data-label-no-conversation="{{ ui_text('还没有对话记录。', 'No conversation yet.') }}">
+<div data-idea-copilot-root data-layout="detail" data-session-id="{{ session_data.id }}" data-reply-pending="{{ 'true' if session_state.reply_pending else 'false' }}" data-label-you="{{ ui_text('你', 'You') }}" data-label-thinking="{{ ui_text('正在思考', 'Thinking') }}" data-label-analysis-title="{{ ui_text('墨枢分析', '墨枢分析') }}" data-label-next-questions="{{ ui_text('下一步问题', 'Next questions') }}" data-label-current-brief="{{ ui_text('当前写作简报', 'Current writing brief') }}" data-label-next-answers="{{ ui_text('建议下一步回答：', 'Suggested next answers:') }}" data-label-readiness="{{ ui_text('准备度', 'Readiness') }}" data-label-no-conversation="{{ ui_text('还没有对话记录。', 'No conversation yet.') }}">
 <div class="page-actions">
   <a href="{{ app_path('/console/chat') }}?session_id={{ session_data.id }}" class="ghost-btn">{{ ui_text('Back to workspace', 'Back to workspace') }}</a>
   <a href="{{ app_path('/console/chat') }}#new-session-form" class="primary-btn secondary">{{ ui_text('New conversation', 'New conversation') }}</a>
@@ -87,7 +87,7 @@
 
     <div class="row-actions">
       <form method="post" action="{{ app_path('/idea-copilot/' ~ session_data.id ~ '/confirm') }}">
-        <button type="submit" class="btn btn-primary">{{ ui_text('交给 NovelClaw 开始创作', 'Hand off to NovelClaw and start creating') }}</button>
+        <button type="submit" class="btn btn-primary">{{ ui_text('交给墨枢 开始创作', 'Hand off to NovelClaw and start creating') }}</button>
       </form>
       <form method="post" action="{{ app_path('/idea-copilot/' ~ session_data.id ~ '/cancel') }}" onsubmit="return confirm('{{ ui_text('确定取消这个创意打磨会话吗？', 'Are you sure you want to cancel this refinement session?') }}');">
         <button type="submit" class="btn btn-outline">{{ ui_text('取消会话', 'Cancel session') }}</button>
@@ -95,7 +95,7 @@
     </div>
     {% else %}
       {% if session_data.final_job_id %}
-      <a class="btn btn-primary" href="{{ app_path('/console/chat') }}?session_id={{ session_data.id }}">{{ ui_text('返回 NovelClaw 工作台', 'Back to NovelClaw workspace') }}</a>
+      <a class="btn btn-primary" href="{{ app_path('/console/chat') }}?session_id={{ session_data.id }}">{{ ui_text('返回墨枢 工作台', 'Back to NovelClaw workspace') }}</a>
       {% else %}
       <div class="soft-block">{{ ui_text('当前会话已结束。', 'This session has ended.') }}</div>
       {% endif %}

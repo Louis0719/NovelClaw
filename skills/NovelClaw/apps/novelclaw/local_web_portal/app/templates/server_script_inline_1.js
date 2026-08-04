@@ -42,7 +42,7 @@
 
       function appendPending() {
         if (feed.querySelector('[data-pending-row=1]')) return;
-        feed.insertAdjacentHTML('beforeend', '<div class=chat-row assistant is-pending data-pending-row=1><div class=avatar-circle>WC</div><div class=assistant-panel><div class=assistant-section><div class=assistant-title>' + (root.dataset.labelAnalysisTitle || 'NovelClaw analysis') + '</div><div class=assistant-text typing-dots>' + (root.dataset.labelThinking || 'Thinking') + '</div></div></div></div>');
+        feed.insertAdjacentHTML('beforeend', '<div class=chat-row assistant is-pending data-pending-row=1><div class=avatar-circle>WC</div><div class=assistant-panel><div class=assistant-section><div class=assistant-title>' + (root.dataset.labelAnalysisTitle || '墨枢分析') + '</div><div class=assistant-text typing-dots>' + (root.dataset.labelThinking || 'Thinking') + '</div></div></div></div>');
         feed.scrollTop = feed.scrollHeight;
       }
 
@@ -61,7 +61,7 @@
               }
               if (data.reply_pending) {
                 appendPending();
-                setStatus('ok', root.dataset.labelContinuing || 'NovelClaw is continuing...');
+                setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
                 return;
               }
               window.clearInterval(timer);
@@ -94,7 +94,7 @@
           .then(readPayload)
           .then(function (data) {
             if (!data || !data.ok) throw new Error((data && (data.error || data.detail)) || 'Submit failed');
-            setStatus('ok', root.dataset.labelContinuing || 'NovelClaw is continuing...');
+            setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
             pollState();
           })
           .catch(function (error) {
@@ -106,7 +106,7 @@
       if (root.dataset.replyPending === 'true') {
         setBusy(true);
         appendPending();
-        setStatus('ok', root.dataset.labelContinuing || 'NovelClaw is continuing...');
+        setStatus('ok', root.dataset.labelContinuing || '墨枢正在继续...');
         pollState();
       }
       return true;

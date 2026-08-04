@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% set zh = ui_language != "en" %}
-{% block title %}{% if zh %}选择模式 | NovelClaw 工作台{% else %}Choose Mode | NovelClaw Workspace{% endif %}{% endblock %}
+{% block title %}{% if zh %}选择模式 | 墨枢工作台{% else %}Choose Mode | 墨枢 Workspace{% endif %}{% endblock %}
 {% block content %}
 <div class="auth-page-shell auth-page-shell-register">
   <header class="auth-page-topbar auth-page-topbar-register">
     <a href="/select-mode" class="auth-page-brand auth-page-brand-link">
-      <span class="auth-page-brand-mark">NC</span>
-      <span>NovelClaw</span>
+      <span class="auth-page-brand-mark">墨</span>
+      <span>墨枢</span>
     </a>
     <div class="auth-register-top-actions">
       <div class="auth-locale-switch">
@@ -37,7 +37,7 @@
       </p>
       <div class="auth-hero-stack">
         <div class="auth-hero-pill">{% if zh %}从 /select-mode 直接开始{% else %}Start directly from /select-mode{% endif %}</div>
-        <div class="auth-hero-pill">{% if zh %}MultiAgent 与 NovelClaw 双工作台{% else %}Dual workspaces: MultiAgent and NovelClaw{% endif %}</div>
+        <div class="auth-hero-pill">{% if zh %}MultiAgent 与 墨枢双工作台{% else %}MultiAgent 与 墨枢双工作台{% endif %}</div>
         <div class="auth-hero-pill">{% if zh %}当前预览：{{ current_mode_label }}{% else %}Current preview: {{ current_mode_label }}{% endif %}</div>
       </div>
     </article>
@@ -75,13 +75,13 @@
         <article class="auth-mode-choice {% if current_mode == 'mode_b' %}is-active{% endif %}">
           <div class="auth-mode-choice-head">
             <div>
-              <div class="auth-mode-choice-kicker">NovelClaw</div>
-              <h3>{% if zh %}NovelClaw 小说工作台{% else %}NovelClaw Workspace{% endif %}</h3>
+              <div class="auth-mode-choice-kicker">墨枢</div>
+              <h3>{% if zh %}墨枢小说创作台{% else %}墨枢 Creative Studio{% endif %}</h3>
             </div>
             <span class="auth-mode-choice-state">{% if current_mode == 'mode_b' %}{% if zh %}当前{% else %}Current{% endif %}{% else %}{% if zh %}可用{% else %}Available{% endif %}{% endif %}</span>
           </div>
           <p class="auth-mode-choice-copy">{% if zh %}更适合章节推进、记忆整理、长线创作和持续性写作打磨。{% else %}Better for chapter progression, memory-aware drafting, and longer-term writing refinement.{% endif %}</p>
-          <a href="{{ mode_b_url }}" class="auth-mode-choice-cta auth-mode-choice-cta-secondary">{% if zh %}打开 NovelClaw{% else %}Open NovelClaw{% endif %}</a>
+          <a href="{{ mode_b_url }}" class="auth-mode-choice-cta auth-mode-choice-cta-secondary">{% if zh %}打开墨枢{% else %}打开墨枢{% endif %}</a>
           <p class="auth-footnote" style="margin-top:10px;">{{ mode_b_display_url }}</p>
         </article>
       </div>
