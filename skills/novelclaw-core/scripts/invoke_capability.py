@@ -52,6 +52,18 @@ CAPABILITY_LIST = [
      "当质量、节奏或长度不达标时，对草稿进行重写或压缩。"),
     ("finalize", "定稿", "Finalize", "核心写作",
      "当当前候选稿达到可接受标准后完成定稿。"),
+    ("inspect_workspace", "检查工作区", "Inspect Workspace", "本地工具",
+     "在执行下一步之前，检查本地运行工作区、章节文件和当前记忆资产。"),
+    ("sync_storyboard", "同步故事板", "Sync Storyboard", "本地工具",
+     "把当前章节 brief 和 Claw 计划写入本地工作区文件与大纲资产。"),
+    ("sync_characters", "同步角色资产", "Sync Characters", "本地工具",
+     "提取当前角色状态，并写入本地文件以及角色记忆。"),
+    ("sync_world", "同步世界设定", "Sync World", "本地工具",
+     "把世界规则与连续性事实提取到本地工作区文件和世界记忆。"),
+    ("dynamic_memory", "动态记忆", "Dynamic Memory", "记忆系统",
+     "跨轮次保存可复用的故事状态、章节简报、事实信息和工作记忆。"),
+    ("evaluator_agent", "评估Agent", "Evaluator Agent", "辅助技能",
+     "评估文本新颖性、连贯性、情绪力度，输出结构化评估报告。"),
     ("idea_analyzer", "创意分析", "Idea Analyzer", "辅助技能",
      "把粗糙想法整理为包含题材、角色、目标和约束的稳定提案。"),
     ("analyzer", "任务分析", "Task Analyzer", "辅助技能",
@@ -434,6 +446,120 @@ Detect and fix: logic jumps, repetition, pacing issues, emotional disconnects, c
 {user_input}
 
 Output JSON: {{"advancing": true/false, "turning_points": [], "notes": "..."}}"""
+        },
+
+        "inspect_workspace": {
+            "zh": """你是一个工作区检查专家。请模拟检查以下写作工作区的状态：
+
+{user_input}
+
+请以 JSON 格式输出检查结果：
+{{"workspace_status": "...", "chapter_files": [...], "memory_assets": [...], "issues": [...]}}""",
+            "en": """As a workspace inspector, simulate checking the writing workspace state:
+
+{user_input}
+
+Output JSON: {{"workspace_status": "...", "chapter_files": [], "memory_assets": [], "issues": []}}"""
+        },
+
+        "sync_storyboard": {
+            "zh": """你是一个故事板同步专家。请将以下章节信息同步到工作区文件：
+
+{user_input}
+
+请确认以下内容已写入本地文件：
+- 章节 brief（chXX_brief.md）
+- 大纲资产（outline.md）
+- 工作记忆（working_set.md）
+
+输出 JSON：
+{{"synced_files": [...], "sync_status": "success"|"partial"|"failed"}}""",
+            "en": """As a storyboard sync expert, confirm syncing chapter info to workspace files:
+
+{user_input}
+
+Output JSON: {{"synced_files": [], "sync_status": "success"}}"""
+        },
+
+        "sync_characters": {
+            "zh": """你是一个角色资产同步专家。请将以下角色状态同步到记忆系统：
+
+{user_input}
+
+请将以下内容写入：
+- 角色状态文件（characters.md）
+- 角色记忆（entity_state bank）
+- 关系网络（relationship_state bank）
+
+输出 JSON：
+{{"synced_characters": [...], "memory_banks_updated": [...], "sync_status": "success"}}""",
+            "en": """As a character sync expert, confirm syncing character state to memory:
+
+{user_input}
+
+Output JSON: {{"synced_characters": [], "memory_banks_updated": [], "sync_status": "success"}}"""
+        },
+
+        "sync_world": {
+            "zh": """你是一个世界观同步专家。请将以下世界观设定同步到记忆系统：
+
+{user_input}
+
+请将以下内容写入：
+- 世界设定文件（world.md）
+- 世界状态（world_state bank）
+- 连续性事实（continuity_facts bank）
+
+输出 JSON：
+{{"synced_world_elements": [...], "memory_banks_updated": [...], "sync_status": "success"}}""",
+            "en": """As a world sync expert, confirm syncing world setting to memory:
+
+{user_input}
+
+Output JSON: {{"synced_world_elements": [], "memory_banks_updated": [], "sync_status": "success"}}"""
+        },
+
+        "dynamic_memory": {
+            "zh": """你是一个动态记忆管理专家。请将以下信息保存到长期记忆系统：
+
+{user_input}
+
+请将内容分类存储到对应的 Memory Bank：
+- session_profile / user_preferences
+- story_premise / style_guide
+- chapter_briefs / scene_cards
+- entity_state / relationship_state
+- world_state / continuity_facts
+- decision_log / revision_notes
+
+输出 JSON：
+{{"stored_banks": [...], "memory_entries": [...], "save_status": "success"}}""",
+            "en": """As a dynamic memory expert, save the following to long-term memory:
+
+{user_input}
+
+Output JSON: {{"stored_banks": [], "memory_entries": [], "save_status": "success"}}"""
+        },
+
+        "evaluator_agent": {
+            "zh": """你是一个创意评估Agent。请对以下文本进行深度评估：
+
+{user_input}
+
+请从以下维度评估：
+1. 新颖性（novelty）：情节/设定/人物的独特程度
+2. 连贯性（coherence）：文本内部逻辑自洽程度
+3. 情绪力度（emotional_score）：情感共鸣和感染力
+
+输出 JSON：
+{{"novelty_score": 0-1, "coherence_score": 0-1, "emotional_score": 0-1, "overall": 0-1, "suggestions": []}}""",
+            "en": """As an evaluator agent, assess the following text deeply:
+
+{user_input}
+
+Evaluate: novelty, coherence, emotional_score (all 0-1).
+
+Output JSON: {{"novelty_score": 0-1, "coherence_score": 0-1, "emotional_score": 0-1, "overall": 0-1, "suggestions": []}}"""
         },
     }
 
