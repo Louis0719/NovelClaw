@@ -337,7 +337,7 @@ Options: A. planning B. drafting C. revising D. finalizing"""
         },
 
         "evaluator": {
-            "zh": f"""你是一个专业的创意评估专家。请评估以下文本：
+            "zh": """你是一个专业的创意评估专家。请评估以下文本：
 
 {user_input}
 
@@ -350,34 +350,34 @@ Options: A. planning B. drafting C. revising D. finalizing"""
   "pacing": 0-1,
   "suggestions": ["建议1", "建议2"]
 }}""",
-            "en": f"""As a creative writing evaluator, assess the following text:
+            "en": """As a creative writing evaluator, assess the following text:
 
 {user_input}
 
-Output JSON: {{"overall_score": 0-1, "coherence": 0-1, "novelty": 0-1, "logic": 0-1, "pacing": 0-1, "suggestions": []}}"""
+Output JSON: {"overall_score": 0-1, "coherence": 0-1, "novelty": 0-1, "logic": 0-1, "pacing": 0-1, "suggestions": []}"""
         },
 
         "judge": {
-            "zh": f"""你是一个公正的文学裁判。请对以下两个章节候选进行裁决：
+            "zh": """你是一个公正的文学裁判。请对以下两个章节候选进行裁决：
 
 {user_input}
 
 请以 JSON 格式输出裁决报告：
 {{
-  "candidate": {{"Relevance": 0-10, "Coherence": 0-10, "Empathy": 0-10, "Surprise": 0-10, "Creativity": 0-10, "Complexity": 0-10, "overall": 0-10}},
-  "reference": {{...}},
+  "candidate": {"Relevance": 0-10, "Coherence": 0-10, "Empathy": 0-10, "Surprise": 0-10, "Creativity": 0-10, "Complexity": 0-10, "overall": 0-10},
+  "reference": {...},
   "winner": "candidate"|"reference"|"tie",
   "notes": ["理由1", "理由2"]
 }}""",
-            "en": f"""You are a fair literary judge. Score two chapter candidates:
+            "en": """You are a fair literary judge. Score two chapter candidates:
 
 {user_input}
 
-Output JSON: {{"candidate": {{...}}, "reference": {{...}}, "winner": "...", "notes": [...]}}"""
+Output JSON: {"candidate": {...}, "reference": {...}, "winner": "...", "notes": [...]}"""
         },
 
         "consistency_checker": {
-            "zh": f"""你是一个一致性检查专家。请检查以下内容的一致性：
+            "zh": """你是一个一致性检查专家。请检查以下内容的一致性：
 
 {user_input}
 
@@ -444,7 +444,8 @@ Output JSON: {{"advancing": true/false, "turning_points": [], "notes": "..."}}""
             return f"Please process the following input using the '{slug}' capability:\n\n{user_input}"
         return f"请使用墨枢的 '{slug}' 能力处理以下输入：\n\n{user_input}"
 
-    return entry.get("en" if is_en else "zh", entry.get("zh", "")).format(input=user_input)
+    template = entry.get("en" if is_en else "zh", entry.get("zh", ""))
+    return template.replace("{user_input}", user_input)
 
 
 # ---------------------------------------------------------------------------
