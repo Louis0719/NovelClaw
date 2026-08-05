@@ -1,234 +1,390 @@
 ---
 name: novelclaw-core
-description: "墨枢核心写作能力：章节写作/评估打分/去AI味检测/一致性检查/情节策略/角色强化/世界观强化/记忆同步。独立 Skill，与天命系统并列。触发词：墨枢、写作、网文、去AI味、章节起草、评审、打分。"
+description: "墨枢核心写作能力：情节策略/章节起草/评估打分/去AI味检测/一致性检查/人物强化/世界观强化/记忆同步。独立 Skill，与天命系统并列。触发词：墨枢、写作、网文、去AI味、章节起草、评审、打分。"
 ---
 
-# NovelClaw Core Skill — 墨枢核心能力
+# 墨枢核心能力 — NovelClaw Core
 
-## 概述
-
-**墨枢**（NovelClaw Core）是专为 AI 网文写作工具设计的 20 项核心能力接口。它为 OpenClaw Agent 提供完整的中文网文创作能力，包括情节策略、人物强化、世界观构建、上下文检索、动态记忆、质量评审等核心功能。
-
-墨枢基于 `capability_registry.py` 中的 CapabilitySpec 定义，支持 Claw 动作（ClawActions）、辅助技能（Support Skills）、记忆系统（Memory System）、本地工具（Local Tools）四大分类。
+> 墨枢是专为中文网文 AI 写作设计的 20 项核心能力包。触发词：**墨枢**、**写作**、**网文**、**去AI味**、**章节起草**、**评审**、**打分**、**情节规划**、**人物强化**、**世界观设定**。
 
 ---
 
-## 能力指令集（20项）
+## 快速索引
 
-| # | 中文名 | 英文名 | Slug | 说明 | Manager Action | 分类 |
-|---|--------|--------|------|------|----------------|------|
-| 1 | 情节策略 | Plot Strategy | `plot_strategy` | 在起草正文前规划章节推进、冲突升级与关键转折点 | `plot_strategy` | Claw 动作 |
-| 2 | 上下文检索 | Context Retrieval | `retrieve_context` | 把相关的动态记忆、事实信息和最近写作状态重新拉回当前循环 | `retrieve_context` | Claw 动作 |
-| 3 | 人物强化 | Character Enrichment | `enrich_character` | 强化人物动机、关系网络、行为边界和角色一致性 | `enrich_character` | Claw 动作 |
-| 4 | 世界观强化 | World Enrichment | `enrich_world` | 明确世界规则、场景约束、设定事实和可复用的正典信息 | `enrich_world` | Claw 动作 |
-| 5 | 检查工作区 | Inspect Workspace | `inspect_workspace` | 在执行下一步之前，检查本地运行工作区、章节文件和当前记忆资产 | `inspect_workspace` | 本地工具 |
-| 6 | 章节起草 | Draft Chapter | `draft_chapter` | 生成当前章节的主体正文草稿 | `draft_chapter` | 核心写作 |
-| 7 | 章节重写 | Rewrite Chapter | `rewrite_chapter` | 当质量、节奏或长度不达标时，对草稿进行重写或压缩 | `rewrite_chapter` | 核心写作 |
-| 8 | 定稿 | Finalize | `finalize` | 当当前候选稿达到可接受标准后完成定稿 | `finalize` | 核心写作 |
-| 9 | 同步故事板 | Sync Storyboard | `sync_storyboard` | 把当前章节 brief 和 Claw 计划写入本地工作区文件与大纲资产 | `sync_storyboard` | 本地工具 |
-| 10 | 同步角色资产 | Sync Characters | `sync_characters` | 提取当前角色状态，并写入本地文件以及角色记忆 | `sync_characters` | 本地工具 |
-| 11 | 同步世界设定 | Sync World | `sync_world` | 把世界规则与连续性事实提取到本地工作区文件和世界记忆 | `sync_world` | 本地工具 |
-| 12 | 创意分析 | Idea Analyzer | `idea_analyzer` | 把粗糙想法整理为包含题材、角色、目标和约束的稳定提案 | — | 辅助技能 |
-| 13 | 任务分析 | Task Analyzer | `analyzer` | 判断当前步骤更需要规划、起草、修订还是收束整理 | — | 辅助技能 |
-| 14 | 动态记忆 | Dynamic Memory | `dynamic_memory` | 跨轮次保存可复用的故事状态、章节简报、事实信息和工作记忆 | — | 记忆系统 |
-| 15 | 转折点追踪 | Turning Point Tracker | `turning_point_tracker` | 追踪章节是否在真正推动故事向前发展 | — | 辅助技能 |
-| 16 | 一致性检查 | Consistency Checker | `consistency_checker` | 检查人物、世界观、时间线和既有事实之间的连续性 | — | 辅助技能 |
-| 17 | 实时编辑 | Realtime Editor | `realtime_editor` | 定位草稿中的薄弱片段并执行针对性的修订 | — | 辅助技能 |
-| 18 | 评估器 | Evaluator | `evaluator` | 评估候选稿的一致性、节奏、情绪力度和任务匹配度 | — | 辅助技能 |
-| 19 | 裁决器 | Judge | `judge` | 当多个章节候选结果接近时，用于做最终裁决 | — | 辅助技能 |
-
----
-
-## 指令分类
-
-### Claw 动作（Claw Actions）
-- `plot_strategy` — 情节策略
-- `retrieve_context` — 上下文检索
-- `enrich_character` — 人物强化
-- `enrich_world` — 世界观强化
-
-### 核心写作（Core Writing）
-- `draft_chapter` — 章节起草（always_enabled）
-- `rewrite_chapter` — 章节重写（always_enabled）
-- `finalize` — 定稿（always_enabled）
-
-### 本地工具（Local Tools）
-- `inspect_workspace` — 检查工作区
-- `sync_storyboard` — 同步故事板
-- `sync_characters` — 同步角色资产
-- `sync_world` — 同步世界设定
-
-### 辅助技能（Support Skills）
-- `idea_analyzer` — 创意分析
-- `analyzer` — 任务分析
-- `turning_point_tracker` — 转折点追踪
-- `consistency_checker` — 一致性检查
-- `realtime_editor` — 实时编辑
-- `evaluator` — 评估器
-- `judge` — 裁决器
-
-### 记忆系统（Memory System）
-- `dynamic_memory` — 动态记忆（always_enabled）
+| 触发词 | 对应能力 | 说明 |
+|---------|----------|------|
+| 帮我写一章 | `draft_chapter` | 生成章节草稿 |
+| 评估这段文字 | `evaluator` | 5维度打分 |
+| 两个版本哪个好 | `judge` | 六维度裁决 |
+| 检查一致性 | `consistency_checker` | 人物/世界观/时间线 |
+| 去AI味 | `realtime_editor` | 实时修订+去AI味 |
+| 转折点 | `turning_point_tracker` | 追踪章节推进 |
+| 情节规划 | `plot_strategy` | 章节推进+冲突设计 |
+| 创意分析 | `idea_analyzer` | 想法→完整提案 |
+| 人物强化 | `enrich_character` | 动机/关系/行为边界 |
+| 世界观设定 | `enrich_world` | 规则/场景/正典信息 |
+| 上下文 | `retrieve_context` | 拉回记忆/事实/状态 |
+| 任务分析 | `analyzer` | 判断当前步骤类型 |
+| 重写 | `rewrite_chapter` | 不达标时重写压缩 |
+| 定稿 | `finalize` | 候选达标后定稿 |
+| 检查工作区 | `inspect_workspace` | 检查章节文件和记忆 |
+| 同步角色 | `sync_characters` | 写入角色文件和记忆 |
+| 同步世界观 | `sync_world` | 写入世界设定和记忆 |
+| 同步故事板 | `sync_storyboard` | 写入章节brief和大纲 |
+| 动态记忆 | `dynamic_memory` | 跨轮次保存状态 |
 
 ---
 
-## Agent 体系
+## 能力详解与使用示例
 
-墨枢内置 8 个专业化 Agent：
+### 1. 情节策略 `plot_strategy`
 
-| Agent | 角色 | 核心方法 | 说明 |
-|-------|------|----------|------|
-| **WriterAgent** | 写作Agent | `generate(prompt, context, topic, target_length)` | 生成小说正文，遵循大纲和风格约束 |
-| **PlotAgent** | 情节构建Agent | `generate(prompt, context, topic, genre)` | 设计故事主线和情节分支 |
-| **CharacterAgent** | 人物塑造Agent | `generate(prompt, context, topic, genre)` | 设计立体人物和关系网络 |
-| **WorldAgent** | 世界观Agent | `generate(prompt, context, topic, genre)` | 设定背景、规则、历史、文化 |
-| **EvaluatorAgent** | 创意评估Agent | `evaluate_multiple(round_results)` | 评估文本新颖性、连贯性、情绪力度 |
-| **JudgeAgent** | 裁判Agent | `generate(prompt, context)` | 六维度打分裁决赛章候选 |
-| **RetrievalAgent** | 数据检索Agent | `generate(prompt, context, topic)` | 检索并整合相关背景信息 |
-| **IdeaCopilotAgent** | 创意副驾 | `generate_turn(original_idea, state, reply)` | 协作式构思，将粗糙想法打磨为稳定brief |
+**触发场景：** 写新章节前、规划故事大纲、不知道如何推进情节
 
----
+**触发词：** "情节规划"、"规划一下"、"冲突怎么设计"、"转折点怎么安排"
 
-## Memory Bank 系统
-
-墨枢使用 Claw Memory Banks 跨轮次保存状态，包含 16 个 Bank：
-
+**示例输入：**
 ```
-session_profile, language_profile, user_preferences, task_briefs,
-story_premise, style_guide, chapter_briefs, scene_cards,
-entity_state, relationship_state, world_state, continuity_facts,
-tool_observations, decision_log, revision_notes, working_set
+题材：都市言情 | 主角：苏念，28岁独立女性，刚离婚 | 开局：雨夜走出民政局 | 主线：从自我怀疑到重新找到价值 | 读者：20-35岁女性
 ```
 
-另有 6 个基础记忆类型索引：
-`generated_text`, `outline`, `character`, `world_setting`, `plot_point`, `fact_card`
+**示例输出：**
+```
+1. 主要情节点：雨夜邂逅（1-3章）→ 职场危机（4-6章）→ 自我怀疑与突破（7-9章）→ 事业新机遇（10-12章）→ 情感新篇章（13-15章）
+2. 每章核心冲突设计...
+3. 节奏安排...
+4. 伏笔埋设与回收计划...
+```
 
 ---
 
-## 质量评审标准
+### 2. 上下文检索 `retrieve_context`
 
-评估器（EvaluatorAgent）输出 JSON 格式报告：
+**触发场景：** 写当前章节时需要回顾之前的情节、角色状态、已埋设的伏笔
 
+**触发词：** "之前设定"、"回顾上文"、"我记得"、"还记得吗"
+
+**示例输入：**
+```
+当前写作状态：正在写第5章结尾，主角苏念刚发现丈夫出轨。
+需要回顾：主角性格设定、前文关键事件、已埋设的伏笔。
+```
+
+**示例输出（JSON）：**
 ```json
 {
-  "overall_score": 0.0-1.0,
-  "coherence": 0.0-1.0,
-  "novelty": 0.0-1.0,
-  "logic": 0.0-1.0,
-  "pacing": 0.0-1.0,
-  "emotional_score": 0.0-1.0,
-  "suggestions": ["建议1", "建议2", ...]
+  "retrieved_context": "苏念性格独立坚强，习惯压抑情绪...",
+  "relevant_facts": ["第2章发现结婚照位置异常", "第3章丈夫晚归频率增加"],
+  "memory_bank_hits": ["entity_state", "continuity_facts"]
 }
 ```
 
-**评分维度**：
-- **coherence** — 连贯性：文本内部逻辑是否自洽
-- **novelty** — 新颖性：创意和独特性程度
-- **logic** — 逻辑性：情节推进是否合理
-- **pacing** — 节奏：叙事节奏把控
-- **emotional_score** — 情绪力度（也称 pacing 或 logic 的加权）
+---
 
-**通过阈值**：通常 `overall_score >= 0.6` 为可接受
+### 3. 人物强化 `enrich_character`
 
-裁决器（JudgeAgent）六维度（0-10）：
-`Relevance`, `Coherence`, `Empathy`, `Surprise`, `Creativity`, `Complexity`
+**触发场景：** 角色不够立体、行为不合逻辑、关系网络模糊
+
+**触发词：** "强化人物"、"角色不够立体"、"动机不清晰"、"人物关系"
+
+**示例输入：**
+```
+基础设定：苏念，28岁，都市女性，刚离婚。
+已有设定：性格独立坚强，不愿将就。
+```
+
+**示例输出：**
+```
+核心动机：害怕再次失去自我 → 导致她在感情中过度防备
+行为边界：绝不妥协物质条件，但愿意为真爱让步
+关系网络：
+  - 前夫陈屿：控制型，离婚主因
+  - 母亲：催婚压力来源，但内心支持
+  - 闺蜜：唯一倾诉对象，理性派
+性格矛盾：外表坚强 vs 内心渴望被理解
+```
 
 ---
 
-## 去AI味检测（实时编辑）
+### 4. 世界观强化 `enrich_world`
 
-RealtimeEditor 执行以下检测与修复：
+**触发场景：** 世界观模糊、规则不明确、场景细节不够
 
-1. **一致性冲突** — 检测人物行为是否与设定矛盾
-2. **逻辑跳跃** — 情节推进是否突兀
-3. **转折突兀** — 转折点是否缺乏铺垫
-4. **人物行为漂移** — 角色性格是否一致
-5. **世界观违规** — 内容是否违反设定规则
-6. **节奏失衡** — 拖沓或过快
-7. **情感断裂** — 情绪转换是否自然
-8. **重复性问题** — 重复表达或情节
-9. **信息矛盾** — 前后信息不一致
-10. **高潮缺失** — 章节是否缺乏情感高潮
-11. **对话僵硬** — 对白是否符合角色性格
-12. **描写空洞** — 场景描写是否具体生动
-13. **伏笔丢失** — 前文伏笔是否回收
-14. **视角混乱** — 叙述视角是否统一
-15. **时间线矛盾** — 时间顺序是否清晰
-16. **背景断裂** — 场景切换是否流畅
-17. **动机薄弱** — 人物行动动机是否充分
-18. **冲突平淡** — 冲突是否足够激烈
-19. **主题模糊** — 章节主题是否明确
-20. **结局仓促** — 结尾是否处理得当
+**触发词：** "世界观"、"设定规则"、"场景细节"、"背景设定"
+
+**示例输入：**
+```
+故事背景：现代一线城市，都市言情，职场线+感情线双线并行
+已有设定：无异能设定，纯现实主义
+```
+
+**示例输出：**
+```
+核心规则：
+  - 职场：能力主义，结果导向（与感情线形成对比）
+  - 感情：慢热型，不存在一见钟情
+场景约束：
+  - 一线城市高压：通勤2小时、周末加班、房租占工资1/3
+  - 社会期待：30岁前结婚、女人要顾家（与主角独立形成冲突）
+正典信息：
+  - 城市地标：国贸CBD（职场）、老城区（怀旧）
+  - 社交场景：相亲角、校友会、公司团建
+```
 
 ---
 
-## 使用方式
+### 5. 章节起草 `draft_chapter`
 
-### 方式一：CLI 调用（通过 invoke_capability.py）
+**触发场景：** 有了大纲，需要生成正文
+
+**触发词：** "写章节"、"起草"、"开始写第X章"
+
+**示例输入：**
+```
+章节目标：苏念在御膳房偶遇皇帝，被皇帝注意到她独特的性格
+字数目标：2000字
+风格要求：轻松幽默，节奏轻快，符合穿越文调性
+```
+
+**示例输出：** 完整的章节正文草稿
+
+---
+
+### 6. 章节重写 `rewrite_chapter`
+
+**触发场景：** 初稿质量不达标、节奏过快或过慢、偏离主题
+
+**触发词：** "重写"、"改写"、"重新起草"、"质量不行"
+
+**示例输入：**
+```
+原始草稿：[粘贴质量不达标的草稿]
+问题描述：节奏过快，情感铺垫不足
+目标：增加情感铺垫，延长至2500字
+```
+
+---
+
+### 7. 定稿 `finalize`
+
+**触发场景：** 章节通过评估，可以正式保存
+
+**触发词：** "定稿"、"保存"、"本章完成"、"结束本章"
+
+**示例输入：**
+```
+候选稿内容：[粘贴通过评估的草稿]
+章节编号：第1章
+文件名：ch01.md
+```
+
+---
+
+### 8. 评估器 `evaluator`
+
+**触发场景：** 章节写完后想知道质量如何、需要改进方向
+
+**触发词：** "评估"、"打分"、"质量怎么样"、"好不好"
+
+**触发词：** "评估"、"打分"、"质量怎么样"、"好不好"
+
+**示例输入：**
+```
+雨是六点四十七分开始下的。苏念刚从民政局大门走出来，手里还攥着那张薄薄的离婚证。红色封皮，烫金字，烫得她手指发烫...
+```
+
+**示例输出（JSON）：**
+```json
+{
+  "overall_score": 0.85,
+  "coherence": 0.9,
+  "novelty": 0.7,
+  "logic": 0.85,
+  "pacing": 0.9,
+  "suggestions": ["增加具体细节描写", "尝试独特比喻提升新颖性"]
+}
+```
+
+**评分标准：**
+- 0.90-1.00 优秀 · 0.75-0.89 良好 · 0.60-0.74 可接受 · <0.60 需重写
+- 通过阈值：`overall_score >= 0.6` 且 `coherence >= 0.5`
+
+---
+
+### 9. 裁决器 `judge`
+
+**触发场景：** 有两个版本不知道选哪个、需要第三方客观判断
+
+**触发词：** "哪个版本好"、"选一个"、"裁决"、"对比"
+
+**示例输入：**
+```
+候选A：[版本A内容]
+---
+候选B：[版本B内容]
+```
+
+**示例输出（JSON）：**
+```json
+{
+  "candidate": {"Relevance": 8, "Coherence": 7, "Empathy": 6, "Surprise": 6, "Creativity": 5, "Complexity": 5, "overall": 6.2},
+  "reference": {"Relevance": 9, "Coherence": 8, "Empathy": 7, "Surprise": 8, "Creativity": 7, "Complexity": 6, "overall": 7.5},
+  "winner": "reference",
+  "notes": ["候选B在角色塑造和情节设计上更胜一筹"]
+}
+```
+
+---
+
+### 10. 一致性检查 `consistency_checker`
+
+**触发场景：** 担心人物行为矛盾、时间线混乱、世界观前后不一致
+
+**触发词：** "检查一致性"、"有没有矛盾"、"前后一致吗"
+
+**示例输入：**
+```
+设定：苏念28岁，都市女性，性格独立坚强，习惯压抑情绪，刚离婚。
+正文：[粘贴需要检查的正文]
+```
+
+**示例输出（JSON）：**
+```json
+{
+  "issues": [
+    "苏念的性格设定是独立坚强，但文中对离婚证的情绪反应稍显不自然",
+    "文中时间线存在模糊：六点四十七分下雨与天气预报之间的逻辑关系不清晰"
+  ],
+  "consistency_score": 0.7
+}
+```
+
+---
+
+### 11. 实时编辑 `realtime_editor`
+
+**触发场景：** 文字有AI味、表达生硬、节奏不对、情感不自然
+
+**触发词：** "去AI味"、"改得不生硬"、"润色"、"修订"
+
+**示例输入：**
+```
+原文：[粘贴需要修订的文本]
+修订目标：减少AI感，增加情感温度，保持风格统一
+```
+
+**示例输出：** 修改后的文本 + 修改说明
+
+---
+
+### 12. 转折点追踪 `turning_point_tracker`
+
+**触发场景：** 章节写完了想知道是否在"推进"故事
+
+**触发词：** "有没有转折"、"推进了吗"、"情节有没有发展"
+
+**示例输入：**
+```
+章节内容：[粘贴章节]
+本章目标：苏念从绝望中看到一丝希望
+```
+
+**示例输出（JSON）：**
+```json
+{
+  "advancing": true,
+  "turning_points": [
+    {"position": "章节25%", "description": "苏念决定带猫回家", "impact": "从绝望到找到责任感的转折"}
+  ],
+  "notes": "本章有效推进了主角心理弧线，从被动承受转向主动行动"
+}
+```
+
+---
+
+### 13. 创意分析 `idea_analyzer`
+
+**触发场景：** 只有一个粗略想法，需要变成完整的故事提案
+
+**触发词：** "我有了一个想法"、"帮我分析"、"创意分析"、"想写但是不知道怎么开始"
+
+**示例输入：**
+```
+一个现代女孩意外穿越到古代成了宫女，她不想争宠只想吃饱饭活下去，结果被皇上注意到
+```
+
+**示例输出：**
+```
+1. 故事类型：古装穿越、宫廷生存、浪漫喜剧
+2. 主要角色：苏小小（女主，25岁现代白领，穿越宫女）+ 皇帝萧瑾瑜（28岁，表面冷酷，内心孤独）
+3. 核心冲突：生存vs自由、爱情vs身份、权力vs良知
+4. 故事目标与约束...
+5. 初步大纲方向...
+```
+
+---
+
+### 14. 任务分析 `analyzer`
+
+**触发场景：** 不知道当前应该做什么——规划？起草？修订？
+
+**触发词：** "我现在该做什么"、"下一步是什么"、"任务分析"
+
+**示例输入：**
+```
+当前状态：有大纲和角色设定，还没有写过正文
+目标：完成第1章
+```
+
+**示例输出：**
+```
+推荐：A. 规划（planning）
+
+理由：当前阶段已有大纲和角色设定，但章节具体内容和节奏尚未确定。建议先用 plot_strategy 规划第1章的情节推进和冲突设计，再进入起草阶段。
+```
+
+---
+
+## 去AI味检测（20项）
+
+RealtimeEditor 执行 20 维度检测：
+
+高优先级：一致性冲突 · 逻辑跳跃 · 转折突兀 · 人物行为漂移 · 世界观违规 · 信息矛盾 · 伏笔丢失 · 视角混乱 · 时间线矛盾
+
+中优先级：节奏失衡 · 情感断裂 · 重复性问题 · 高潮缺失 · 对话僵硬 · 背景断裂 · 动机薄弱 · 结局仓促
+
+低优先级：描写空洞 · 冲突平淡 · 主题模糊
+
+---
+
+## CLI 调用方式
 
 ```bash
-# 查看所有可用能力
-python scripts/invoke_capability.py --list
+# 列出所有能力
+python3 skills/novelclaw-core/scripts/invoke_capability.py --list
 
-# 调用情节策略能力
-python scripts/invoke_capability.py \
-  --capability plot_strategy \
-  --input "都市玄幻，主角获得上古传承，都市修炼" \
-  --output result.json
-
-# 调用评估器
-python scripts/invoke_capability.py \
+# 评估文本
+python3 skills/novelclaw-core/scripts/invoke_capability.py \
   --capability evaluator \
-  --input "文本内容..." \
-  --output eval_result.json
+  --input "雨是六点四十七分开始下的。苏念刚从民政局..."
 
-# 调用裁决器（两个候选）
-python scripts/invoke_capability.py \
+# 裁决两个候选
+python3 skills/novelclaw-core/scripts/invoke_capability.py \
   --capability judge \
-  --input "候选A...\n---\n候选B..." \
-  --output judge_result.json
-```
+  --input "候选A内容...\n---\n候选B内容"
 
-### 方式二：作为 OpenClaw Skill 集成
-
-在 Agent 对话中直接引用：
-```
-请使用墨枢的 plot_strategy 能力，为以下故事构思章节推进计划：
-[用户输入的故事大纲]
-```
-
-### 方式三：编程调用
-
-```python
-from novelclaw_core import NovelClawCore
-
-core = NovelClawCore(config={"api_key": "your-key", "provider": "deepseek"})
-
-# 情节策略
-result = core.invoke("plot_strategy", {
-    "prompt": "都市玄幻，主角获得上古传承",
-    "context": "已设定：修炼等级分九重天..."
-})
-
-# 评估
-eval_result = core.invoke("evaluator", {
-    "text": "待评估的小说文本..."
-})
-
-# 裁决
-judge_result = core.invoke("judge", {
-    "candidate": "候选章节A内容",
-    "reference": "候选章节B内容"
-})
+# 一致性检查
+python3 skills/novelclaw-core/scripts/invoke_capability.py \
+  --capability consistency_checker \
+  --input "设定：苏念28岁...\n正文：..."
 ```
 
 ---
 
 ## 源码位置
 
-- 墨枢核心：`~/openclaw-workspace/skills/NovelClaw/apps/novelclaw/`
+- 墨枢核心：`skills/NovelClaw/apps/novelclaw/`
+- Agent 实现：`agents/`（writer/plot/character/world/evaluator/judge/retrieval/idea_copilot）
+- 记忆系统：`rag/memory_system.py` · `rag/retriever.py`
+- 实时编辑：`rag/realtime_editor.py` · `rag/consistency_checker.py` · `rag/turning_point_tracker.py`
 - 能力注册：`capability_registry.py`
-- Agent 实现：`agents/` (writer_agent.py, evaluator_agent.py, ...)
-- 记忆系统：`rag/memory_system.py`, `rag/retriever.py`
-- 实时编辑：`rag/realtime_editor.py`
-- 静态知识库：`rag/static_knowledge_base.py`
