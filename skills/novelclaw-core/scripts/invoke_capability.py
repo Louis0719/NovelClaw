@@ -34,6 +34,15 @@ import textwrap
 from typing import Any, Dict, List, Optional
 
 # ---------------------------------------------------------------------------
+# 可选依赖：partial-json-parser（处理 LLM 输出截断的 JSON）
+# ---------------------------------------------------------------------------
+try:
+    from partial_json_parser import loads as partial_json_loads, JSONDecodeError as PartialJSONDecodeError
+    _PARTIAL_JSON_AVAILABLE = True
+except ImportError:
+    _PARTIAL_JSON_AVAILABLE = False
+
+# ---------------------------------------------------------------------------
 # 配置和 Capability 注册
 # ---------------------------------------------------------------------------
 
@@ -160,7 +169,7 @@ def call_llm(
     model: str,
     messages: List[Dict[str, str]],
     temperature: float = 0.7,
-    max_tokens: int = 4096,
+    max_tokens: int = 8192,  # analyzer 等分析类能力可能输出较长理由
 ) -> str:
     """调用 LLM 并返回内容字符串。"""
     try:
@@ -614,10 +623,12 @@ def invoke_capability(
 
     result_text = call_llm(client, model or "MiniMax-Text-01", messages, temperature=0.7)
 
-    # 尝试解析 JSON
+    # 尝试解析 JSON（处理截断的 LLM 输出）
     parsed = None
+    truncation_warning = False
+
+    # 方法1：先尝试标准 JSON.parse（完整 JSON）
     try:
-        # 尝试提取 JSON 块
         text = result_text.strip()
         json_start = text.find("{")
         if json_start >= 0:
@@ -652,10 +663,22 @@ def invoke_capability(
     except Exception:
         pass
 
+    # 方法2：partial-json-parser 处理截断 JSON（截断时 fallback）
+    if parsed is None and _PARTIAL_JSON_AVAILABLE:
+        try:
+            text = result_text.strip()
+            if text.startswith("{") or text.startswith("["):
+                parsed = partial_json_loads(text)
+                if parsed is not None:
+                    truncation_warning = True
+        except PartialJSONDecodeError:
+            pass  # 解析失败，保持 parsed=None
+
     return {
         "capability": slug,
         "raw": result_text,
         "parsed": parsed,
+        "truncated": truncation_warning,
         "success": True,
     }
 
