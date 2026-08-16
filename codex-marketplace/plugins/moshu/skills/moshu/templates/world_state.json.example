@@ -65,7 +65,15 @@
     "last_aggressive_rewrite": null,
     "cumulative_p0_fixed": 0,
     "cumulative_p1_fixed": 0,
-    "cumulative_p2_fixed": 0
+    "cumulative_p2_fixed": 0,
+    "cumulative_tokens_in": 0,
+    "cumulative_tokens_out": 0,
+    "cumulative_cost_cny": 0,
+    "last_task_model": null,
+    "last_task_tokens": {
+      "in": 0,
+      "out": 0
+    }
   },
   "next_chapter_plan": {
     "chapter": 9,
