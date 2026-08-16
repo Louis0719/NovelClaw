@@ -7,8 +7,9 @@
 > 「让 AI 像人一样写网文，而不是像 AI 一样写网文。」
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-DC2626.svg?style=flat-square)](LICENSE)
-[![Codex](https://img.shields.io/badge/Codex-Plugin%20Ready-7C3AED.svg?style=flat-square)](codex-marketplace/)
-[![Version](https://img.shields.io/badge/version-v0.2.0-059669.svg?style=flat-square)](https://github.com/Louis0719/NovelClaw/releases)
+[![Codex](https://img.shields.io/badge/Codex-Plugin%20Ready-7C3AED.svg?style=flat-square)](codex-marketplace/README.md)
+[![Version](https://img.shields.io/badge/version-v0.2.1-059669.svg?style=flat-square)](https://github.com/Louis0719/NovelClaw/releases)
+![Codex CLI](https://img.shields.io/badge/Codex%20CLI-%3E%3D0.142.5-blue.svg?style=flat-square)
 
 </div>
 
@@ -31,6 +32,11 @@
 
 ## 🚀 快速开始
 
+> **前置条件**：[Codex CLI](https://github.com/openai/codex) **≥ 0.142.5**
+> ```bash
+> codex --version   # 检查版本，低于 0.142.5 请先 `codex update`
+> ```
+
 ### 方式 A：Codex CLI 安装（推荐）
 
 ```bash
@@ -39,6 +45,9 @@ codex plugin marketplace add https://github.com/Louis0719/NovelClaw --sparse cod
 
 # 2. 安装墨枢
 codex plugin add moshu@novelclaw-marketplace
+
+# 3. 验证安装
+codex plugin list   # 应看到 moshu@novelclaw-marketplace installed: true
 ```
 
 ### 方式 B：本地克隆
@@ -48,6 +57,29 @@ git clone https://github.com/Louis0719/NovelClaw.git
 cd NovelClaw
 # 直接加载 skills/moshu/SKILL.md 即可使用
 ```
+
+---
+
+## ❓ 常见问题（FAQ）
+
+**Q1: `--sparse codex-marketplace` 是什么意思？**
+A: 只拉取 `codex-marketplace/` 子目录，避免下载整个仓库历史。**必须使用这个路径**，否则会下载到错误的目录。
+
+**Q2: 安装时报 `unknown variant NONE` 错误？**
+A: 这是 authPolicy 字段错误，请确保 `marketplace.json` 里使用 `"ON_INSTALL"` 或 `"ON_USE"`，不要用 `NONE`。（v0.2.1 已修复）
+
+**Q3: novel-reader 装完后报错找不到 playwright？**
+A: 这是必需的 Python 依赖。装完 Codex 插件后还需：
+```bash
+pip install playwright
+playwright install chromium
+```
+
+**Q4: 我装了 v0.2.0，可以升级到 v0.2.1 吗？**
+A: 可以，`codex plugin upgrade moshu@novelclaw-marketplace`，无需卸载重装。
+
+**Q5: 装好后怎么在 Codex 里调用？**
+A: 在 Codex 对话里说 "写小说"、"去AI味"、"评审" 等，墨枢会自动触发。
 
 ---
 
