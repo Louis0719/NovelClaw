@@ -1,0 +1,76 @@
+{
+  "current_chapter": 8,
+  "last_updated": "2026-08-16",
+  "platform": "番茄",
+  "genre": "古言甜宠",
+  "update_rhythm": "日更 4000字",
+  "protagonists": {
+    "顾晚宁": {
+      "role": "女主",
+      "location": "将军府·东院",
+      "emotional_state": "忐忑不安",
+      "goal_this_chapter": "完成与太子的初见，但要保留一丝警惕",
+      "goal_status": "进行中",
+      "secrets_known": ["自己是穿越者", "原主曾被退婚"],
+      "secrets_unknown": ["太子也在观察她", "侍女是庶妹的眼线"]
+    },
+    "萧衡": {
+      "role": "男主",
+      "location": "东宫·书房",
+      "emotional_state": "平静（表象）",
+      "goal_this_chapter": "试探女主是否真失忆",
+      "goal_status": "进行中",
+      "secrets_known": ["原主没失忆", "退婚是皇帝指使"],
+      "secrets_unknown": ["女主已换芯", "女主发现书房暗格"]
+    }
+  },
+  "supporting_cast": {
+    "青竹": {
+      "role": "女主贴身侍女",
+      "loyalty": "表面忠，实际庶妹眼线",
+      "last_appeared": "Ch.7"
+    },
+    "顾芷柔": {
+      "role": "庶妹",
+      "loyalty": "敌对",
+      "last_appeared": "Ch.6"
+    }
+  },
+  "plot_threads": {
+    "主线_退婚疑云": {
+      "status": "进行中",
+      "foreshadow_chapters": [1, 3],
+      "revealed_in": null,
+      "planned_reveal": 25,
+      "notes": "Ch.8 太子在书房试探女主，本章新增一条暗格线索"
+    },
+    "支线_庶妹阴谋": {
+      "status": "伏笔中",
+      "foreshadow_chapters": [2, 5],
+      "revealed_in": null,
+      "planned_reveal": 30,
+      "notes": "Ch.5 已埋青竹是眼线，Ch.8 庶妹尚未正面出场"
+    },
+    "伏笔_书房暗格": {
+      "status": "伏笔中",
+      "foreshadow_chapters": [8],
+      "revealed_in": null,
+      "planned_reveal": 18,
+      "notes": "Ch.8 新埋：女主发现萧衡书房有暗格但未打开"
+    }
+  },
+  "writing_state": {
+    "last_ai_density_score": 0,
+    "last_review": null,
+    "last_aggressive_rewrite": null,
+    "cumulative_p0_fixed": 0,
+    "cumulative_p1_fixed": 0,
+    "cumulative_p2_fixed": 0
+  },
+  "next_chapter_plan": {
+    "chapter": 9,
+    "core_event": "庶妹正式登场，引发第一个冲突",
+    "emotion_arc": "平静→警觉→压抑怒火",
+    "hook": "庶妹说出原主死前的最后一句话"
+  }
+}
