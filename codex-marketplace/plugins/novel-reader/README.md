@@ -9,13 +9,22 @@
 - 📖 单章/批量章节阅读
 - 🧹 内容清洗（去广告/格式化/统一编码）
 
-## 安装
+## ⚠️ 前置依赖（必须）
+
+本插件依赖 **Playwright**（Python 包 + Chromium 浏览器），**装 Codex 插件前**先装好：
 
 ```bash
-# 前置：安装 playwright
 pip install playwright
 playwright install chromium
+```
 
+> 这两个是 Python 依赖，Codex CLI 不会自动跑 pip。如果跳过这一步，插件会报 `playwright not found` 错误。
+
+## 安装
+
+> **前置条件**：`codex --version` ≥ 0.142.5 + 上面的 Playwright 已装
+
+```bash
 # 1. 添加 NovelClaw marketplace
 codex plugin marketplace add https://github.com/Louis0719/NovelClaw --sparse codex-marketplace
 

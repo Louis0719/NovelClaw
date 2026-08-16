@@ -4,12 +4,14 @@
 
 通过 [OpenAI Codex CLI](https://github.com/openai/codex) 一键安装墨枢生态所有 AI 写作插件。
 
+> **前置条件**：`codex --version` 应 **≥ 0.142.5**，否则请先运行 `codex update`
+
 ## 🚀 快速安装
 
 ### 1. 添加 NovelClaw Marketplace
 
 ```bash
-# 方式A：完整下载（推荐）
+# 方式A：推荐（Sparse 拉取，只下载 codex-marketplace/ 子目录，加速 ~80%）
 codex plugin marketplace add https://github.com/Louis0719/NovelClaw --sparse codex-marketplace
 
 # 方式B：本地路径（开发调试）
@@ -33,6 +35,17 @@ codex plugin add tianming-novel-system@novelclaw-marketplace
 
 ```bash
 codex plugin list
+# 应看到：
+#   moshu@novelclaw-marketplace                  installed
+#   novel-reader@novelclaw-marketplace           installed
+#   tianming-novel-system@novelclaw-marketplace  installed
+```
+
+### 4. 升级已装插件
+
+```bash
+codex plugin upgrade moshu@novelclaw-marketplace    # 升级单个
+codex plugin marketplace upgrade novelclaw-marketplace  # 升级整个 marketplace
 ```
 
 ## 📦 插件列表
@@ -65,20 +78,20 @@ codex plugin list
 
 ### 添加新插件
 
-```bash
+```text
 codex-marketplace/
-├── .agents/plugins/marketplace.json     # 顶层清单
+├── .agents/plugins/marketplace.json     # 顶层清单（policy.authentication 只支持 ON_INSTALL / ON_USE，不支持 NONE）
 └── plugins/
     └── your-plugin/
-        ├── .codex-plugin/plugin.json   # 插件元数据
-        ├── pyproject.toml
+        ├── .codex-plugin/plugin.json   # 插件元数据（interface.composerIcon 和 logo 路径必须存在）
+        ├── pyproject.toml              # dependencies 字段作为插件运行时依赖参考
         ├── README.md
         ├── assets/
-        │   ├── icon.png
-        │   └── logo.png
+        │   ├── icon.png                # 必需，512x512 推荐
+        │   └── logo.png                # 必需，16:9 推荐
         └── skills/
             └── your-plugin/
-                └── SKILL.md
+                └── SKILL.md            # plugin.json 的 skills 字段指向此处（默认 ./skills/）
 ```
 
 ### 本地测试
@@ -86,8 +99,21 @@ codex-marketplace/
 ```bash
 codex plugin marketplace add ./codex-marketplace
 codex plugin list --available
-codex plugin add your-plugin@novelclaw-marketplace
+codex plugin add your-plugin@novelclaw-marketplace    # 测试安装
+codex plugin remove your-plugin@novelclaw-marketplace  # 测完清理
 ```
+
+---
+
+## ❓ Troubleshooting
+
+| 错误信息 | 原因 | 修复 |
+|---------|------|------|
+| `marketplace 不包含 plugin` | 漏了 `--sparse codex-marketplace` | 重跑带 `--sparse codex-marketplace` |
+| `unknown variant NONE` | marketplace.json 的 authentication 字段写错 | 改为 `ON_INSTALL` 或 `ON_USE` |
+| `找不到 SKILL.md` | skills/ 子目录命名与 plugin.json 的 name 不一致 | 确保 `plugins/<name>/skills/<name>/SKILL.md` 三处一致 |
+| `plugin icon 不存在` | assets/icon.png 或 logo.png 缺失或路径错 | 检查 plugin.json 的 `interface.composerIcon` 路径 |
+| `playwright not found`（仅 novel-reader） | Python 依赖未装 | `pip install playwright && playwright install chromium` |
 
 ## 📜 License
 

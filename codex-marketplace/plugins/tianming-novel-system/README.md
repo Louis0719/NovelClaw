@@ -26,6 +26,8 @@
 
 ## 安装
 
+> **前置条件**：`codex --version` ≥ 0.142.5
+
 ```bash
 # 1. 添加 NovelClaw marketplace
 codex plugin marketplace add https://github.com/Louis0719/NovelClaw --sparse codex-marketplace
