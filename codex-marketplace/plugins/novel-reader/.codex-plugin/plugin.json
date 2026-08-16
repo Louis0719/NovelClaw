@@ -1,0 +1,42 @@
+{
+  "name": "novel-reader",
+  "version": "1.0.0",
+  "description": "用 Playwright 读取国内小说网站（17K 主力 + 备用平台），支持目录抓取、章节阅读、内容清洗。",
+  "author": {
+    "name": "Louis / 来财",
+    "email": "louis0719@users.noreply.github.com",
+    "url": "https://github.com/Louis0719"
+  },
+  "homepage": "https://github.com/Louis0719/NovelClaw",
+  "repository": "https://github.com/Louis0719/NovelClaw/tree/main/codex-marketplace/plugins/novel-reader",
+  "license": "MIT",
+  "keywords": [
+    "novel",
+    "reader",
+    "网文",
+    "爬虫",
+    "17K",
+    "Playwright",
+    "content-extraction"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Novel Reader",
+    "shortDescription": "国内小说网站内容抓取与清洗",
+    "longDescription": "用 Playwright 读取国内主流小说网站（17K主力 + 备用平台），支持目录抓取、单章阅读、批量章节拉取、内容清洗（去广告/格式化/统一编码）。适用于网文素材收集、爆款拆解、风格采样。",
+    "developerName": "Louis / 来财",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Extract"
+    ],
+    "websiteURL": "https://github.com/Louis0719/NovelClaw",
+    "defaultPrompt": [
+      "抓取《xxx》的最新50章",
+      "把第123章清洗后保存到本地",
+      "列出这本书的目录"
+    ],
+    "brandColor": "#059669",
+    "screenshots": []
+  }
+}

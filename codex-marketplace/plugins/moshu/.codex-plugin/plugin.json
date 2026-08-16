@@ -1,0 +1,50 @@
+{
+  "name": "moshu",
+  "version": "2.1.0",
+  "description": "墨枢 (mòshū) — 中文网文AI写作搭档：去AI味检测 + 爆款方法论 + 天命写作流，覆盖番茄/七猫/17K等平台爆款逻辑。",
+  "author": {
+    "name": "Louis / 来财",
+    "email": "louis0719@users.noreply.github.com",
+    "url": "https://github.com/Louis0719"
+  },
+  "homepage": "https://github.com/Louis0719/NovelClaw",
+  "repository": "https://github.com/Louis0719/NovelClaw/tree/main/codex-marketplace/plugins/moshu",
+  "license": "MIT",
+  "keywords": [
+    "novel",
+    "writing",
+    "网文",
+    "中文",
+    "AI写作",
+    "去AI味",
+    "爆款",
+    "番茄",
+    "七猫",
+    "17K"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "墨枢 · Moshu",
+    "shortDescription": "中文网文爆款写作AI搭档",
+    "longDescription": "墨枢（mòshū）是中文网文爆款写作的多Agent协同系统。涵盖立项/章节写作/去AI味润色/爆款评审全流程。内置番茄/七猫/17K平台爆款逻辑、30字卖点+200字故事核方法论、20项AI味自动检测标准、9维度淘汰制评审+7维度雷达图。让AI像人一样写网文，而不是像AI一样写网文。",
+    "developerName": "Louis / 来财",
+    "category": "Writing",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Louis0719/NovelClaw",
+    "privacyPolicyURL": "https://github.com/Louis0719/NovelClaw/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/Louis0719/NovelClaw/blob/main/LICENSE",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png",
+    "defaultPrompt": [
+      "帮我写一本番茄爆款小说，题材是重生复仇女强",
+      "继续写下一章，去掉AI味，要爽点密集",
+      "评审我写的这章，按9维度淘汰制打分",
+      "帮我做一份30字卖点+200字故事核"
+    ],
+    "brandColor": "#DC2626",
+    "screenshots": []
+  }
+}

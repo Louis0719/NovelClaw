@@ -1,0 +1,47 @@
+{
+  "name": "tianming-novel-system",
+  "version": "1.0.0",
+  "description": "「天命」长篇小说协同创作系统 — 世界观一致性 / 伏笔回收 / 节奏控制 / 文风稳定的多Agent创作框架。",
+  "author": {
+    "name": "Louis / 来财",
+    "email": "louis0719@users.noreply.github.com",
+    "url": "https://github.com/Louis0719"
+  },
+  "homepage": "https://github.com/Louis0719/NovelClaw",
+  "repository": "https://github.com/Louis0719/NovelClaw/tree/main/codex-marketplace/plugins/tianming-novel-system",
+  "license": "MIT",
+  "keywords": [
+    "novel",
+    "writing",
+    "天命",
+    "长篇",
+    "世界观",
+    "多Agent",
+    "协同创作"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "天命 · Tianming",
+    "shortDescription": "长篇小说协同创作系统",
+    "longDescription": "「天命」是面向长篇小说项目的协同创作系统。核心解决跨章节的世界观一致性、伏笔回收、节奏控制、文风稳定四大难题。基于5件套知识库（《世界基石》《世界观规则》《角色档案》《档案事件》《文风样本》），通过大纲→草案→正文→体检→存档的五阶段工作流，让多Agent团队接力写百万字长篇不崩。",
+    "developerName": "Louis / 来财",
+    "category": "Writing",
+    "capabilities": [
+      "Interactive",
+      "Write",
+      "Plan"
+    ],
+    "websiteURL": "https://github.com/Louis0719/NovelClaw",
+    "defaultPrompt": [
+      "天命：大纲",
+      "天命：规划",
+      "天命：目录",
+      "天命：草案",
+      "天命：正文",
+      "天命：体检",
+      "天命：存档"
+    ],
+    "brandColor": "#7C3AED",
+    "screenshots": []
+  }
+}

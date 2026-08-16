@@ -1,0 +1,15 @@
+[project]
+name = "moshu"
+version = "2.1.0"
+description = "墨枢 — 中文网文爆款写作AI搭档"
+requires-python = ">=3.9"
+dependencies = []
+
+[tool.oaipkg]
+disallow-dependents = true
+ruff_full_check = false
+unsafe-provides-packages = []
+
+[tool.setuptools]
+packages = []
+py-modules = []

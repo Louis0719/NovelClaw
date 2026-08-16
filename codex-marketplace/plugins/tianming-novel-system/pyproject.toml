@@ -1,0 +1,15 @@
+[project]
+name = "tianming-novel-system"
+version = "1.0.0"
+description = "天命长篇小说协同创作系统"
+requires-python = ">=3.9"
+dependencies = []
+
+[tool.oaipkg]
+disallow-dependents = true
+ruff_full_check = false
+unsafe-provides-packages = []
+
+[tool.setuptools]
+packages = []
+py-modules = []

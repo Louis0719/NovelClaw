@@ -1,0 +1,50 @@
+{
+  "name": "novelclaw-marketplace",
+  "description": "墨枢 NovelClaw 中文网文写作生态 — 多Agent协同 · 去AI味 · 爆款方法论 · 天命评审",
+  "owner": {
+    "name": "Louis / 来财",
+    "email": "louis0719@users.noreply.github.com",
+    "url": "https://github.com/Louis0719"
+  },
+  "homepage": "https://github.com/Louis0719/NovelClaw",
+  "repository": "https://github.com/Louis0719/NovelClaw",
+  "license": "MIT",
+  "plugins": [
+    {
+      "name": "moshu",
+      "source": {
+        "source": "local",
+        "path": "./plugins/moshu"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Writing"
+    },
+    {
+      "name": "novel-reader",
+      "source": {
+        "source": "local",
+        "path": "./plugins/novel-reader"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "tianming-novel-system",
+      "source": {
+        "source": "local",
+        "path": "./plugins/tianming-novel-system"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Writing"
+    }
+  ]
+}
