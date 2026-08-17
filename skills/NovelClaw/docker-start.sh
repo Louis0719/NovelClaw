@@ -27,23 +27,41 @@ echo ""
 
 echo "Setting up environment files..."
 
+# Note: .env files live in apps/{app}/.env to match docker-compose.yml volume mounts.
+# Templates are stored in apps/{app}/local_web_portal/.env.example (one source of truth).
+
 if [ ! -f "apps/auth-portal/.env" ]; then
-    cp .env.auth-portal.example apps/auth-portal/.env
-    echo "[OK] Created apps/auth-portal/.env"
+    if [ -f "apps/auth-portal/local_web_portal/.env.example" ]; then
+        cp apps/auth-portal/local_web_portal/.env.example apps/auth-portal/.env
+        echo "[OK] Created apps/auth-portal/.env"
+    else
+        echo "[ERROR] Template not found: apps/auth-portal/local_web_portal/.env.example"
+        exit 1
+    fi
 else
     echo "[SKIP] apps/auth-portal/.env already exists"
 fi
 
 if [ ! -f "apps/multiagent/.env" ]; then
-    cp .env.multiagent.example apps/multiagent/.env
-    echo "[OK] Created apps/multiagent/.env"
+    if [ -f "apps/multiagent/local_web_portal/.env.example" ]; then
+        cp apps/multiagent/local_web_portal/.env.example apps/multiagent/.env
+        echo "[OK] Created apps/multiagent/.env"
+    else
+        echo "[ERROR] Template not found: apps/multiagent/local_web_portal/.env.example"
+        exit 1
+    fi
 else
     echo "[SKIP] apps/multiagent/.env already exists"
 fi
 
 if [ ! -f "apps/novelclaw/.env" ]; then
-    cp .env.novelclaw.example apps/novelclaw/.env
-    echo "[OK] Created apps/novelclaw/.env"
+    if [ -f "apps/novelclaw/local_web_portal/.env.example" ]; then
+        cp apps/novelclaw/local_web_portal/.env.example apps/novelclaw/.env
+        echo "[OK] Created apps/novelclaw/.env"
+    else
+        echo "[ERROR] Template not found: apps/novelclaw/local_web_portal/.env.example"
+        exit 1
+    fi
 else
     echo "[SKIP] apps/novelclaw/.env already exists"
 fi

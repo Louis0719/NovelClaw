@@ -212,6 +212,10 @@ notes.md
 !CHANGELOG.md
 !LICENSE.md
 !.gitkeep
+# Allow specific skill subprojects to ship supplementary docs on demand.
+# This is a narrow allowlist — do NOT generalize to skills/**/*.md without
+# first auditing what other .md files are currently being ignored.
+!skills/NovelClaw/LOCAL_SETUP.md
 
 # JSON configs
 *.json
@@ -257,6 +261,13 @@ scripts/
 social-auto-upload/
 xhs-mcp/
 .clawhub/
+
+# 🔥 白名单：项目内的 scripts/ 子目录（与上面「monorepo 自己的 scripts/」不同）
+# 历史教训：scripts/ 通配曾意外拦截 README.zh-CN.md、tests/check_json.py 等
+# 2026-08-17：解决 NovelClaw skill 的脚本提交问题
+!skills/NovelClaw/scripts/
+!skills/**/scripts/check_*.py
+!skills/**/tests/
 
 # 测试文件
 xhs-video-fetch.js

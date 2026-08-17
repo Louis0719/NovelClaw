@@ -18,7 +18,7 @@
   </p>
 
   <p>
-    <b>🌐 Try it online:</b> <a href="https://colong-idea-studio.cloud/">colong-idea-studio.cloud</a>
+    <b>🌐 Try it online:</b> <a href="README.zh-CN.md">中文 README</a> · <a href="README.md">English README</a>
   </p>
 
   <p>
@@ -26,11 +26,10 @@
   </p>
 
   <p>
-    <a href="https://colong-idea-studio.cloud/"><img src="https://img.shields.io/badge/Live%20Platform-Open%20Now-0f766e?style=flat-square&logo=googlechrome&logoColor=white" alt="Live platform"></a>
     <a href="README.zh-CN.md"><img src="https://img.shields.io/badge/Chinese-README-ef4444?style=flat-square" alt="Chinese README"></a>
-    <a href="RUN_LOCAL_WEB.md"><img src="https://img.shields.io/badge/Local%20Run-Startup%20Guide-f59e0b?style=flat-square&logo=readthedocs&logoColor=white" alt="Local run guide"></a>
-    <a href="DEPLOYMENT.md"><img src="https://img.shields.io/badge/Deployment-Server%20Notes-0f766e?style=flat-square" alt="Deployment guide"></a>
-    <a href="WHAT_IS_SAFE_FOR_GITHUB.md"><img src="https://img.shields.io/badge/GitHub%20Safe-Checklist-111827?style=flat-square" alt="GitHub safety"></a>
+    <a href="#quick-start"><img src="https://img.shields.io/badge/Local%20Run-Startup%20Guide-f59e0b?style=flat-square&logo=readthedocs&logoColor=white" alt="Local run guide"></a>
+    <a href="#runtime-artifacts"><img src="https://img.shields.io/badge/Deployment-Server%20Notes-0f766e?style=flat-square" alt="Deployment guide"></a>
+    <a href="#github-safe-checklist"><img src="https://img.shields.io/badge/GitHub%20Safe-Checklist-111827?style=flat-square" alt="GitHub safety"></a>
   </p>
 
   <p>
@@ -49,7 +48,7 @@
 > 👀 Enter from **`http://127.0.0.1:8010/select-mode`**, then continue into **`http://127.0.0.1:8012/dashboard`** for the main NovelClaw workspace.
 
 > 🌐 **Live Platform**
-> Visit **[colong-idea-studio.cloud](https://colong-idea-studio.cloud/)** if you want the fastest online entry point.
+> Read the [中文 README](README.zh-CN.md) for the same content in Chinese.
 
 ## Overview 🌟
 
@@ -96,7 +95,7 @@ NovelClaw solves all three. It turns long-form writing into ongoing sessions, pe
 ## Visual Tour 👀
 
 <p align="center">
-  <img src="docs/readme-triptych-en.png" alt="From clean entry to sustained drafting to inspectable chapter control" width="100%">
+  <em>No screenshot available yet — try the local stack below to inspect the UI directly.</em>
 </p>
 
 NovelClaw is built around a simple claim: long-form writing quality improves when drafting, review, and memory control are treated as a continuing workspace rather than a one-pass generation event. ✨
@@ -104,7 +103,7 @@ NovelClaw is built around a simple claim: long-form writing quality improves whe
 ## Why It Stands Out ✨
 
 <p align="center">
-  <img src="docs/dynamic-memory.png" alt="NovelClaw workflow across chapters, memory, and inspectable outputs" width="100%">
+  <em>No diagram available yet — see the workflow description in the section below.</em>
 </p>
 
 | Common writing pain | NovelClaw solution |
@@ -173,9 +172,9 @@ chmod +x docker-start.sh
 **Or manually:**
 ```bash
 # 1. Setup environment files
-cp .env.auth-portal.example apps/auth-portal/.env
-cp .env.multiagent.example apps/multiagent/.env
-cp .env.novelclaw.example apps/novelclaw/.env
+cp apps/auth-portal/local_web_portal/.env.example apps/auth-portal/.env
+cp apps/multiagent/local_web_portal/.env.example apps/multiagent/.env
+cp apps/novelclaw/local_web_portal/.env.example apps/novelclaw/.env
 
 # 2. Review .env files. API keys are optional until you run a cloud provider.
 
@@ -200,8 +199,8 @@ The portal keeps the host you opened (`localhost` or `127.0.0.1`) when it sends 
 - easy to start, stop, and manage services
 - data persistence through volumes
 
-📖 See [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) for detailed Docker deployment guide.
-🤖 CLI/agent automation can use the token API in [docs/AGENT_API.md](docs/AGENT_API.md).
+📖 See the Docker section below (`./docker-start.sh` or `.\docker-start.bat`) for the full deployment flow.
+🤖 CLI/agent automation can use the token API at `/api/v1/*` (auth via `APP_AGENT_API_KEY`).
 
 </details>
 
@@ -307,7 +306,7 @@ In short: `Models` configures the writing stack, `Chat` starts and steers the se
 ## Architecture 🧠
 
 <p align="center">
-  <img src="docs/workflow.png" alt="NovelClaw workflow diagram" width="94%">
+  <em>No diagram available yet — the description below maps the same architecture.</em>
 </p>
 
 The architecture links public entry, writing sessions, run execution, manuscript review, and memory-aware continuation into one inspectable loop, so the workspace can support longer projects without collapsing into a single opaque prompt interaction.
@@ -368,9 +367,9 @@ Representative `progress.log` events:
 - upload source, docs, and infrastructure references only
 - keep real `.env` values and secrets outside the repository
 - do not commit runtime databases, restored snapshots, or local keys after running the stack
-- treat `/claw/` as the main product route and `/select-mode` as its public entry
+- treat `/dashboard` as the main product route and `/select-mode` as its public entry
 
-See [DEPLOYMENT.md](DEPLOYMENT.md), [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md), [RUN_LOCAL_WEB.md](RUN_LOCAL_WEB.md), [docs/LOCAL_RUN.zh-CN.md](docs/LOCAL_RUN.zh-CN.md), and [WHAT_IS_SAFE_FOR_GITHUB.md](WHAT_IS_SAFE_FOR_GITHUB.md) for operator-focused details.
+See the Quick Start and Runtime Artifacts sections above for operator-focused details.
 
 </details>
 
@@ -380,9 +379,4 @@ See [DEPLOYMENT.md](DEPLOYMENT.md), [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.z
 ## Documentation 📚
 
 - 🇨🇳 Chinese README: [README.zh-CN.md](README.zh-CN.md)
-- 🌐 Local run guide: [RUN_LOCAL_WEB.md](RUN_LOCAL_WEB.md)
-- 🌐 本地运行指南: [docs/LOCAL_RUN.zh-CN.md](docs/LOCAL_RUN.zh-CN.md)
-- 🛠️ Deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
-- 🛠️ 部署说明: [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md)
-- 🔐 GitHub safety notes: [WHAT_IS_SAFE_FOR_GITHUB.md](WHAT_IS_SAFE_FOR_GITHUB.md)
 - ⚖️ License: [MIT](LICENSE)
