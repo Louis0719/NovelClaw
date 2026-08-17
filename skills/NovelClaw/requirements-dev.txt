@@ -1,0 +1,2 @@
+# Dev / CI dependencies only — not for runtime.
+pytest>=7.4.0

@@ -258,6 +258,13 @@ social-auto-upload/
 xhs-mcp/
 .clawhub/
 
+# 🔥 白名单：项目内的 scripts/ 子目录（与上面「monorepo 自己的 scripts/」不同）
+# 历史教训：scripts/ 通配曾意外拦截 README.zh-CN.md、tests/check_json.py 等
+# 2026-08-17：解决 NovelClaw skill 的脚本提交问题
+!skills/NovelClaw/scripts/
+!skills/**/scripts/check_*.py
+!skills/**/tests/
+
 # 测试文件
 xhs-video-fetch.js
 
