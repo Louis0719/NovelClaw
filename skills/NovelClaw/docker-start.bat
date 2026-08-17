@@ -34,25 +34,45 @@ echo [OK] Docker Compose command: %COMPOSE%
 echo.
 
 REM Setup environment files
+REM Note: .env files live in apps\{app}\.env to match docker-compose.yml volume mounts.
+REM Templates are stored in apps\{app}\local_web_portal\.env.example (one source of truth).
 echo Setting up environment files...
 
 if not exist "apps\auth-portal\.env" (
-    copy .env.auth-portal.example apps\auth-portal\.env >nul
-    echo [OK] Created apps\auth-portal\.env
+    if exist "apps\auth-portal\local_web_portal\.env.example" (
+        copy apps\auth-portal\local_web_portal\.env.example apps\auth-portal\.env >nul
+        echo [OK] Created apps\auth-portal\.env
+    ) else (
+        echo [ERROR] Template not found: apps\auth-portal\local_web_portal\.env.example
+        pause
+        exit /b 1
+    )
 ) else (
     echo [SKIP] apps\auth-portal\.env already exists
 )
 
 if not exist "apps\multiagent\.env" (
-    copy .env.multiagent.example apps\multiagent\.env >nul
-    echo [OK] Created apps\multiagent\.env
+    if exist "apps\multiagent\local_web_portal\.env.example" (
+        copy apps\multiagent\local_web_portal\.env.example apps\multiagent\.env >nul
+        echo [OK] Created apps\multiagent\.env
+    ) else (
+        echo [ERROR] Template not found: apps\multiagent\local_web_portal\.env.example
+        pause
+        exit /b 1
+    )
 ) else (
     echo [SKIP] apps\multiagent\.env already exists
 )
 
 if not exist "apps\novelclaw\.env" (
-    copy .env.novelclaw.example apps\novelclaw\.env >nul
-    echo [OK] Created apps\novelclaw\.env
+    if exist "apps\novelclaw\local_web_portal\.env.example" (
+        copy apps\novelclaw\local_web_portal\.env.example apps\novelclaw\.env >nul
+        echo [OK] Created apps\novelclaw\.env
+    ) else (
+        echo [ERROR] Template not found: apps\novelclaw\local_web_portal\.env.example
+        pause
+        exit /b 1
+    )
 ) else (
     echo [SKIP] apps\novelclaw\.env already exists
 )

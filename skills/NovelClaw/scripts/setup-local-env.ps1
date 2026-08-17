@@ -47,17 +47,23 @@ $fernetKey = Get-OrCreateLocalDevSecret $fernetKeyPath {
   ([Convert]::ToBase64String($bytes) -replace '\+','-' -replace '/','_')
 }
 
-$authApp = Join-Path $root "apps\auth-portal\local_web_portal"
-$multiApp = Join-Path $root "apps\multiagent\local_web_portal"
-$clawApp = Join-Path $root "apps\novelclaw\local_web_portal"
+# Write .env to apps/{app}/.env (matches docker-compose.yml volume mounts at ./apps/{app}/.env)
+# Templates remain in apps/{app}/local_web_portal/.env.example (one source of truth).
+$authApp = Join-Path $root "apps\auth-portal"
+$multiApp = Join-Path $root "apps\multiagent"
+$clawApp = Join-Path $root "apps\novelclaw"
 
-$authDb = Join-Path $authApp "data\app.db"
-$multiDb = Join-Path $multiApp "data\app.db"
-$clawDb = Join-Path $clawApp "data\app.db"
-$multiRuns = Join-Path $multiApp "runs"
-$clawRuns = Join-Path $clawApp "runs"
+$authDataDir = Join-Path $authApp "local_web_portal\data"
+$multiDataDir = Join-Path $multiApp "local_web_portal\data"
+$clawDataDir = Join-Path $clawApp "local_web_portal\data"
+$multiRuns = Join-Path $multiApp "local_web_portal\runs"
+$clawRuns = Join-Path $clawApp "local_web_portal\runs"
 
-New-Item -ItemType Directory -Force -Path (Join-Path $authApp "data"), (Join-Path $multiApp "data"), (Join-Path $multiApp "runs"), (Join-Path $clawApp "data"), (Join-Path $clawApp "runs") | Out-Null
+$authDb = Join-Path $authDataDir "app.db"
+$multiDb = Join-Path $multiDataDir "app.db"
+$clawDb = Join-Path $clawDataDir "app.db"
+
+New-Item -ItemType Directory -Force -Path $authDataDir, $multiDataDir, $multiRuns, $clawDataDir, $clawRuns | Out-Null
 
 $authEnv = @"
 APP_BASE_URL=http://127.0.0.1:8010
@@ -165,3 +171,8 @@ TURNING_POINT_ENABLED=1
 Write-FileIfNeeded -Path (Join-Path $authApp ".env") -Content $authEnv -OverwriteExisting:$Overwrite
 Write-FileIfNeeded -Path (Join-Path $multiApp ".env") -Content $multiEnv -OverwriteExisting:$Overwrite
 Write-FileIfNeeded -Path (Join-Path $clawApp ".env") -Content $clawEnv -OverwriteExisting:$Overwrite
+# Also mirror to local_web_portal/.env for any legacy local-only tooling that still
+# looks there (settings.py's load_dotenv fallback chain reads both).
+Write-FileIfNeeded -Path (Join-Path $root "apps\auth-portal\local_web_portal\.env") -Content $authEnv -OverwriteExisting:$Overwrite
+Write-FileIfNeeded -Path (Join-Path $root "apps\multiagent\local_web_portal\.env") -Content $multiEnv -OverwriteExisting:$Overwrite
+Write-FileIfNeeded -Path (Join-Path $root "apps\novelclaw\local_web_portal\.env") -Content $clawEnv -OverwriteExisting:$Overwrite
