@@ -303,6 +303,38 @@ In short: `Models` configures the writing stack, `Chat` starts and steers the se
   </tr>
 </table>
 
+## 9 Specialized Agents 🤖
+
+The writing workspace is driven by nine coordinated agents — each owns one craft so you can keep steering instead of fighting the model.
+
+| Agent | Responsibility |
+|---|---|
+| `writer_agent` | Drafts chapter prose under the current session context |
+| `character_agent` | Keeps character profiles and voice consistent across chapters |
+| `world_agent` | Locks in world rules and settings — AI output must respect them |
+| `plot_agent` | Manages plot threads, foreshadowing, and pay-offs |
+| `judge_agent` | Six-dimension scoring judge for two candidate texts (Relevance, Coherence, Empathy, Surprise, Creativity, Complexity) |
+| `evaluator_agent` | Multi-dimension scoring with concrete improvement suggestions |
+| `retrieval_agent` | RAG-style context retrieval across chapters and memory bank |
+| `idea_copilot_agent` | Language-routed ideation partner for premise, tone, and cast |
+| `base_agent` | Shared base class and utilities for all agents |
+
+In addition to the nine agents, two workspace features guard quality end-to-end:
+
+- 🔍 **De-AI Detector** — flags 20+ AI-tells (transition words, structural clichés, generic phrasing) and surfaces fix suggestions while drafting
+- 📊 **Hit-Rate Review** — 9-dimension elimination review with per-chapter scoring and pacing diagnostics, so weak drafts fail fast before they reach readers
+
+## Roadmap 🗺️
+
+| Version | Status | Highlights |
+|---|---|---|
+| **v0.3.1** | ✅ shipped | Moshu cost control — Haiku scoring mode cuts cost by ~90% |
+| **v0.3.0** | ✅ shipped | Moshu de-AI upgrade — 5 new capabilities + full bug-fix pass |
+| **v0.2.0** | ✅ shipped | Codex Plugin compatibility — moshu / novel-reader / tianming |
+| **v0.2.1** | ✅ shipped | Codex install docs + README polish |
+| **v1.0** | 🔜 planned | Tomato / Qimao platform data integration + real-time hit-rate leaderboards |
+| **v1.1** | 🔜 planned | Multi-author studio collaboration mode |
+
 ## Architecture 🧠
 
 <p align="center">

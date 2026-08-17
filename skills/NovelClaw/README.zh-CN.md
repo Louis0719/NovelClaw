@@ -74,7 +74,7 @@
 | `character_agent` | 角色设定与人设一致性 |
 | `world_agent` | 世界观规则与设定一致性 |
 | `plot_agent` | 情节线索管理与伏笔追踪 |
-| `judge_agent` | 内容质量判定 |
+| `judge_agent` | 六维度评分裁判（相关性/连贯/共情/惊喜/创意/复杂度）|
 | `evaluator_agent` | 多维度评估打分 |
 | `retrieval_agent` | 上下文检索（RAG） |
 | `idea_copilot_agent` | 创意构思辅助 |
