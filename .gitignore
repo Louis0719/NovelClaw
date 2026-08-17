@@ -212,6 +212,10 @@ notes.md
 !CHANGELOG.md
 !LICENSE.md
 !.gitkeep
+# Allow specific skill subprojects to ship supplementary docs on demand.
+# This is a narrow allowlist — do NOT generalize to skills/**/*.md without
+# first auditing what other .md files are currently being ignored.
+!skills/NovelClaw/LOCAL_SETUP.md
 
 # JSON configs
 *.json
