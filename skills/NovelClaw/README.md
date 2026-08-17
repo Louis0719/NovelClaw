@@ -200,7 +200,7 @@ The portal keeps the host you opened (`localhost` or `127.0.0.1`) when it sends 
 - data persistence through volumes
 
 📖 See the Docker section below (`./docker-start.sh` or `.\docker-start.bat`) for the full deployment flow.
-🤖 CLI/agent automation can use the token API in [docs/AGENT_API.md](docs/AGENT_API.md).
+🤖 CLI/agent automation can use the token API at `/api/v1/*` (auth via `APP_AGENT_API_KEY`).
 
 </details>
 
