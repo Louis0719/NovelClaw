@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-DC2626.svg?style=flat-square)](LICENSE)
 [![Codex](https://img.shields.io/badge/Codex-Plugin%20Ready-7C3AED.svg?style=flat-square)](codex-marketplace/README.md)
-[![Version](https://img.shields.io/badge/version-v0.2.1-059669.svg?style=flat-square)](https://github.com/Louis0719/NovelClaw/releases)
+[![Version](https://img.shields.io/badge/version-v0.3.1-059669.svg?style=flat-square)](https://github.com/Louis0719/NovelClaw/releases)
 ![Codex CLI](https://img.shields.io/badge/Codex%20CLI-%3E%3D0.142.5-blue.svg?style=flat-square)
 
 </div>
